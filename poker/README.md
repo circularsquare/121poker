@@ -1,10 +1,10 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+run "rails server" to start! website will be on localhost:3000
 
-Things you may want to cover:
+dependencies are rails, squib
 
+<!--
 * Ruby version
 
 * System dependencies
@@ -21,4 +21,5 @@ Things you may want to cover:
 
 * Deployment instructions
 
-* ...
+* ...-->
+
