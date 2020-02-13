@@ -1,0 +1,20 @@
+<!-- file made by andrew 2/13 while learning rails -->
+
+<h1> three of diamonds </h1>
+
+
+<%= form_with scope: :article, local: true do |form| %>
+  <p>
+    <%= form.label :number %><br>
+    <%= form.text_field :number %>
+  </p>
+
+  <p>
+    <%= form.label :suit %><br>
+    <%= form.text_field :suit %>
+  </p>
+
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>
