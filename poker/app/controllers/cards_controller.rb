@@ -16,6 +16,6 @@ class CardsController < ApplicationController
 
   private
     def card_params
-      params.require(:card).permit(:rank, :suit)
+      params.require(:card).permit(:rank, :suit, :location)
     end
 end

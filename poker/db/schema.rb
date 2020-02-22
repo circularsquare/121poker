@@ -13,8 +13,10 @@
 ActiveRecord::Schema.define(version: 2020_02_18_221317) do
 
   create_table "cards", force: :cascade do |t|
+    t.integer "card_id"
     t.string "suit"
     t.string "rank"
+    t.string "location"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
