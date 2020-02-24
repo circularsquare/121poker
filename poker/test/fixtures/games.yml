@@ -1,13 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  suit: 
-  rank: 
-  location: MyString
-  game: one
+  room_name: MyString
 
 two:
-  suit: 
-  rank: 
-  location: MyString
-  game: two
+  room_name: MyString

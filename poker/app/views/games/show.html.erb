@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Room name:</strong>
+  <%= @game.room_name %>
+</p>
+
+<p>
+  player 1's cards: <br/>
+  Ace of 7
+</p>
+<p>
+  player 2's cards <br/>
+  <%= @hi %>
+</p>
+<p>
+  player 3
+</p>
+<p>
+  player 4
+</p>
+
+
+<%= link_to 'Edit', edit_game_path(@game) %> |
+<%= link_to 'Back', games_path %>
