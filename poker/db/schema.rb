@@ -7,11 +7,10 @@
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
-#
-# It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2020_02_23_225019) do
 
+  # TODO: eliminate card_id column
   create_table "cards", force: :cascade do |t|
     t.integer "card_id"
     t.string "suit"
@@ -21,12 +20,15 @@ ActiveRecord::Schema.define(version: 2020_02_23_225019) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  # has_many cards and players,
+  # TODO: add columns for more game info
   create_table "games", force: :cascade do |t|
     t.string "room_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  # not child or parent of other tables
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
