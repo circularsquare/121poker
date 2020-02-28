@@ -1,15 +1,237 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= require_self
- */
+body {
+  font: 90% georgia, sans-serif;
+  line-height: 1.55;
+  color: #555753;
+  background: #e6e6f6;
+  margin-left: 15px;}
+a {
+  color: #547;
+  &:link {
+    font-weight: bold;
+    text-decoration: none;
+    color: #a785DF;}
+  &:visited {
+    font-weight: bold;
+    text-decoration: none;
+    color: #D4CDDC;}
+  &:hover, &:focus, &:active {
+    text-decoration: underline;
+    color: #9685BA;}}
+h1{
+  font-size: 160%;
+  color: #555;
+  margin: 1px 2px;
+  font-weight: lighter;}
+h2{
+  font-size: 120%;
+  margin: 2px;
+  color: #666;
+  font-weight: normal;}
+h3 {
+  font-size: 60%;
+  margin: 5px;
+  color: #aaa;
+  font-weight: lighter;
+  float: right;
+  display: inline;}
+h4{
+  font-size: 80%;
+  color: #666;
+  margin: 0px;
+  padding: 0px;
+  font-weight: normal;}
+ul {
+  margin: 0px;
+  padding: 0px 5px;
+  display: block;
+  list-style: none;}
+button {
+  display: inline-block;
+  border: 1px, #555753;
+  padding: 3px;
+  margin: 0;
+  text-decoration: none;
+  background: #ddd;
+  color: #555753;
+  font-family: georgia;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out, transform 150ms ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  z-index: 100;}
+path{
+  stroke: #bbb;
+  fill: transparent;}
+.tabs {
+  height: 77%;
+  width: 100%;
+  margin-bottom: 3px;
+  display: flex;
+  flex-direction: column;} //need to make this align to screen size
+.tab-list {
+  overflow: hidden;
+  padding: 3px;
+  margin: 4px 0px;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;}
+.tab-list-item {
+  background-color: inherit;
+  float: left;
+  list-style: none;
+  border: none;
+  outline: 1px;
+  cursor: pointer;
+  padding: 0.2rem .5rem;
+  transition: 0.3s;
+  &:hover {
+    background-color: #ddd;}}
+.tab-list-active {
+  background-color: #ccc;}
+.tab-content {
+  padding: 7px 6px;
+  border: 1px solid #ccc;
+  height: 90%;}
+.sidebar-wrapper{
+  height: 100%;
+  width: 20%;
+  min-width: 100px;
+  max-width: 200px;
+  margin-right: 10px;
+  display: inline-block;}
+.sidebar {
+  position: absolute;
+  width: 20%;
+  min-width: 100px;
+  max-width: 200px;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #cfb3ff;
+  overflow-x: hidden;
+  display: inline-block;
+  padding-top: 8px;
+  padding-left: 6px;
+  background: #eee;
+  border-right: 1px solid #ccc;}
+.not-sidebar{
+  margin: 0px 2px;
+  display: inline-block;
+  position: absolute;
+  width: 78%;
+  height: 100%;}
+.sidebar-item {
+  width: 89%;
+  padding: 0px 3px;
+  margin: 1px;
+  border: 1px solid #aaa;
+  background-color: #f5f5f5;
+  &:hover .sidebar-item-mouseover{
+    visibility: visible;}}
+.sidebar-item-mouseover{
+  font-size: 90%;
+  padding: 1px 4px;
+  visibility: hidden;
+  width: 150px;
+  z-index: 100;
+  opacity: .97;
+  background-color: #fafafa;
+  border: 1px solid #aaa;
+  position: absolute;}
+.effect-detail{
+  font-size: 90%}
+.header{
+  height: 20px;
+  margin-right: 8px;}
+.infobox {
+  background-color: #ddd;
+  overflow: auto;
+  border: 1px solid #ccc;
+  height: 16%;
+  width: 98%;
+  padding: 5px 7px;
+  display: inline-block;}
+.menu {
+  margin: 5px 0px;
+  padding: 2px 5px;
+  border: 1px solid #ccc;
+  background-color: #f8faff;
+  width: 90%;
+  max-width: 1000px;
+  display: inline-block;}
+
+.menu-item {
+  position: relative;
+  margin: 5px 0px;
+  padding: 2px 5px;
+  background-color: #fbfffb;
+  border: 1px solid #d8d8d8;
+  display: inline-block;
+  &:hover .menu-item-mouseover {
+    background-color: #111111;
+    visibility: visible;}}
+.menu-item:hover {
+  background-color: #eee;}
+.menu-item-mouseover {
+  font-size: 85%;
+  padding: 1px 4px;
+  visibility: hidden;
+  width: 200px;
+  z-index: 100;
+  opacity: 1;
+  background-color: #e7faff;
+  border: 1px solid #ccc;
+  position: absolute;}
+.round { //round button
+  margin: 2px;
+  width: 16px;
+  height: 16px;
+  line-height: 1px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  color: #455;
+  text-align: center;
+  background: #d9e2ff;
+  box-shadow: 0 0 3px #ccd7e8;
+  font-size: 9px;
+  font-weight: bolder;
+  z-index: -100;
+  &:hover {
+    background: #8ca7ff;}
+}
+.round-y {
+  @extend .round;
+  background: #fffeb3;
+  &:hover {background:#fcfb60}}
+.round-g {
+  @extend .round;
+  background: #c7ffd3;
+  &:hover {background: #87fa9f}}
+.round-r {
+  @extend .round;
+  background: #ffe3e3;
+  &:hover {background: #ffa1a1}}
+.lines {
+  position:static;
+  height: 0px;
+  width: 0px;
+  width: 0px;
+  height: 0px;
+  z-index: 0;}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;}
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  -webkit-border-radius: 10px;
+  border-radius: 10px;}
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: rgba(200,200,200,0.8);
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(200,200,200,0.4); }
