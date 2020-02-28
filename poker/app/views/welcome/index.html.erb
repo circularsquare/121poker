@@ -5,11 +5,10 @@
   <% else %>
     <h4>You are not logged in :( </h4>
   <%end%>
-  <button onClick = "window.location.href = '/welcome/tutorial';"> go to tutorial </button> <br/>
-  <button onClick = "window.location.href = '/game/1';"> go to game 1 </button> <br/>
-  <button onClick = "window.location.href = '/login';"> login </button> <br/>
-  <button onClick = "window.location.href = '/users/new';"> sign up </button <br/>
-  <button onClick = "window.location.href = '/logout';"> logout </button <br/>
-  <%= link_to "Log out", logout_path, method: "delete" %>
+  <%= link_to "Tutorial", '/welcome/tutorial' %> <br/>
+  <%= link_to "Go to Game 1", '/games/1' %> <br/>
+  <%= link_to "Log in", '/login' %> <br/>
+  <%= link_to "Sign Up", '/users/new', method: "get" %> <br/>
+  <%= link_to "Log out", logout_path, method: "delete" %> <br/>
 
 </h1>

@@ -5,21 +5,11 @@
   <%= @game.room_name %>
 </p>
 
-<p>
-  player 1's cards: <br/>
-  Ace of 7
-</p>
-<p>
-  player 2's cards <br/>
-  <%= @hi %>
-</p>
-<p>
-  player 3
-</p>
-<p>
-  player 4
-</p>
+hi. <br/>
+<%= Card.find(1).rank %>
+<%= Card.find(1).suit %>
+ <br/>
+<!-- TODO: button that calls a function in gamescontroller-->
 
-
-<%= link_to 'Edit', edit_game_path(@game) %> |
-<%= link_to 'Back', games_path %>
+<%= link_to 'Edit', edit_game_path(@game) %> <br/>
+<%= link_to 'Back', games_path %><br/>
