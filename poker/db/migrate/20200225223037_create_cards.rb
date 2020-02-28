@@ -4,7 +4,8 @@ class CreateCards < ActiveRecord::Migration[6.0]
       t.string :suit
       t.string :rank
       t.string :location
-      t.references :game, null: false, foreign_key: true
+      t.integer :game_id
+
       t.timestamps
     end
   end

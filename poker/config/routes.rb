@@ -8,11 +8,16 @@ Rails.application.routes.draw do
   #extra webpages not associated with resources
   get 'welcome/tutorial'
 
+  get 'login', to: 'sessions#new'
+  post 'login', to: 'sessions#create'
+  delete 'logout', to: 'sessions#destroy'
+  get 'logout', to: 'sessions#destroy'
+
   #created by andrew while learning rails 2/13, see app/controllers/cards_controller.rb
   resources :games
-  #resources method, used to declare a standard REST resource, provides many routes
   resources :cards
   resources :users
   resources :players
+  #resources method, used to declare a standard REST resource, provides many routes
 
 end

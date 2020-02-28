@@ -7,31 +7,42 @@
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_23_225019) do
+ActiveRecord::Schema.define(version: 2020_02_28_030315) do
 
-  # TODO: eliminate card_id column
   create_table "cards", force: :cascade do |t|
-    t.integer "card_id"
     t.string "suit"
     t.string "rank"
     t.string "location"
+    t.integer "game_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  # has_many cards and players,
-  # TODO: add columns for more game info
   create_table "games", force: :cascade do |t|
     t.string "room_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  # not child or parent of other tables
-  create_table "users", force: :cascade do |t|
+  create_table "players", force: :cascade do |t|
+    t.string "ai"
+    t.string "username"
+    t.string "game"
+    t.string "location"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username"
+    t.string "password"
+    t.string "player"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "password_digest"
   end
 
 end
