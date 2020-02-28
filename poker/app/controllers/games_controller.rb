@@ -10,7 +10,6 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
-    @hi = Card
   end
 
   # GET /games/new
