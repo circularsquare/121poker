@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+
     <title>Poker</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -10,6 +12,15 @@
   </head>
 
   <body>
+    <div class='menu'>
+      <div class='menu-item'><%= link_to "Home", '/login', class: 'a' %> </div>
+      <div class='menu-item'><%= link_to "Log in", '/login', class: 'a' %> </div>
+      <div class='menu-item'><%= link_to "Sign Up", '/users/new', method: "get" %> </div>
+      <div class='menu-item'><%= link_to "Log out", logout_path, method: "delete" %></div>
+      <div class='menu-item'><%= link_to "Tutorial", '/welcome/tutorial' %></div>
+      <div class='menu-item'><%= link_to "Game 1", '/games/1' %> </div>
+      <div class='menu-item'> bruh </div>
+    </div>
     <%= yield %>
   </body>
 </html>
