@@ -1,6 +1,15 @@
 <h1>
-  hello!
-  <button onClick = "window.location.href = '/welcome/tutorial';"> go to tutorial </button>
-  <button onClick = "window.location.href = '/game/1';"> go to game 1 </button>
-  <%= %>
+  hello! <br/>
+  <% if logged_in? %>
+    <h4>You are Logged In, <%= current_user.username %></h4>
+  <% else %>
+    <h4>You are not logged in :( </h4>
+  <%end%>
+  <button onClick = "window.location.href = '/welcome/tutorial';"> go to tutorial </button> <br/>
+  <button onClick = "window.location.href = '/game/1';"> go to game 1 </button> <br/>
+  <button onClick = "window.location.href = '/login';"> login </button> <br/>
+  <button onClick = "window.location.href = '/users/new';"> sign up </button <br/>
+  <button onClick = "window.location.href = '/logout';"> logout </button <br/>
+  <%= link_to "Log out", logout_path, method: "delete" %>
+
 </h1>
