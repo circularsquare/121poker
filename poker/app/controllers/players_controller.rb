@@ -25,16 +25,12 @@ class PlayersController < ApplicationController
   # POST /players.json
   def create
     @player = Player.new(player_params)
+    redirect_to '/'
+  end
 
-    respond_to do |format|
-      if @player.save
-        format.html { redirect_to @player, notice: 'Player was successfully created.' }
-        format.json { render :show, status: :created, location: @player }
-      else
-        format.html { render :new }
-        format.json { render json: @player.errors, status: :unprocessable_entity }
-      end
-    end
+  def create_ai
+    @player = Player.new(player_params)
+    redirect_to '/'
   end
 
   # PATCH/PUT /players/1
