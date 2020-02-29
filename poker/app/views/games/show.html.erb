@@ -8,8 +8,15 @@
 hi. <br/>
 <%= Card.find(1).rank %>
 <%= Card.find(1).suit %>
- <br/>
-<!-- TODO: button that calls a function in gamescontroller-->
+<br/> <br/>
+
+Players: <br/>
+<% @game.players.each do |player| %>
+  <%= player.user.username %>
+  says hello <br/>
+<%end%>
+
+<%= button_to 'Add AI', player_path, method: :create %> <!-- this should probably just redirect you to a new players form -->
 
 <%= link_to 'Edit', edit_game_path(@game) %> <br/>
 <%= link_to 'Back', games_path %><br/>

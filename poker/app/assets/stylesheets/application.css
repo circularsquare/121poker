@@ -184,6 +184,11 @@ path{
   background-color: #e7faff;
   border: 1px solid #ccc;
   position: absolute;}
+.username {
+  margin: 5px 0px;
+  padding: 2px 5px;
+  float: right;
+}
 .round { //round button
   margin: 2px;
   width: 16px;

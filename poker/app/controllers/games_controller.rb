@@ -10,6 +10,11 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
+    if logged_in?
+      if not @game.players.includes(current_user)
+        @game.add_player(current_user)
+      end
+    end
   end
 
   # GET /games/new
