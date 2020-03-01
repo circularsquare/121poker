@@ -25,6 +25,9 @@ class PlayersController < ApplicationController
   # POST /players.json
   def create
     @player = Player.new(player_params)
+    if @player.user.ai = nil
+      @player.user.currentPlayer = @player
+    end
     redirect_to '/'
   end
 
