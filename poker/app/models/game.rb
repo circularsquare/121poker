@@ -17,11 +17,11 @@ class Game < ApplicationRecord
     @card.location = 'bruh'
   end
 
-  def add_player(user)
-    Player.create({:ai => nil, :game => self, :user => user, :location => 'new player'})
+  def add_user_player(user)
+    Player.create({:ai => nil, :game => self, :username => user.username, :user => user, :location => 'new player'})
   end
   def add_ai_player()
-    Player.create({:ai => 'ai 1', :game => self, :user => user, :location => 'new ai player'})
+    Player.create({:ai => 'ai 1', :game => self, :username => 'ai', :user => user, :location => 'new ai player'})
   end
 
 end

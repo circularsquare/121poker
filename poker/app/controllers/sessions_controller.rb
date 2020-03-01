@@ -12,12 +12,6 @@ class SessionsController < ApplicationController
    end
   end
 
-  def login
-  end
-
-  def welcome
-  end
-
   def destroy
     helpers.log_out
     redirect_to '/'
