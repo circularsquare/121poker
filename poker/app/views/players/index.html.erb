@@ -7,6 +7,7 @@
     <tr>
       <th>Ai</th>
       <th>Username</th>
+      <th>user.username </th>
       <th>Game</th>
       <th>Location</th>
       <th colspan="3"></th>
@@ -18,7 +19,8 @@
       <tr>
         <td><%= player.ai %></td>
         <td><%= player.username %></td>
-        <td><%= player.game %></td>
+        <td><%= player.user.username %> </td>
+        <td><%= player.game.id%></td>
         <td><%= player.location %></td>
         <td><%= link_to 'Show', player %></td>
         <td><%= link_to 'Edit', edit_player_path(player) %></td>

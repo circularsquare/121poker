@@ -18,7 +18,7 @@ class GamesController < ApplicationController
           in_game = true
         end
       end
-      if not in_game 
+      if not in_game
         @game.add_user_player(current_user)
       end
     end
@@ -66,6 +66,10 @@ class GamesController < ApplicationController
   # DELETE /games/1
   # DELETE /games/1.json
   def destroy
+    @game.players.each do |p|
+      p.destroy
+    end
+
     @game.destroy
     respond_to do |format|
       format.html { redirect_to games_url, notice: 'Game was successfully destroyed.' }
