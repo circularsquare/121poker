@@ -21,7 +21,9 @@
       <div class='menu-item'><%= link_to "Games", '/games' %> </div>
       <div class='menu-item'><%= link_to "New Game", '/games/new' %> </div>
 
-      <div class='username'> <%= current_user.username %> </div>
+
+      <div class='username'> <% if logged_in? %>
+        <h4> <%= current_user.username %></h4>  <% end %></div>
     </div>
     <%= yield %>
   </body>
