@@ -10,15 +10,20 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
-    @current_user = current_user
     if logged_in?
       in_game = false
       @game.players.each do |p|
-        if p.user = current_user
+        p p
+        if p.user_id == current_user.id
+          p "BRUHHHHH"
+          p p
+          p p.user_id
+          p current_user.id
           in_game = true
         end
       end
       if not in_game
+        p "BRUHH"
         @game.add_user_player(current_user)
       end
     end

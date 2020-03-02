@@ -18,7 +18,12 @@ class Game < ApplicationRecord
   end
 
   def add_user_player(user)
-    self.players.create({:ai => nil, :game => self, :username => user.username, :user => user, :location => 'new player'})
+    @player = Player.new({:ai => '', :game_id => self.id, :user_id => user.id, :money => 0, :username => user.username, :location => 'new player'})
+    p self.players.size
+    p @player
+    p self
+    self.players << @player
+    self.save
   end
   def add_ai_player()
     Player.create({:ai => 'ai 1', :game => self, :username => 'ai', :user => user, :location => 'new ai player'})
