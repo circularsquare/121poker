@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_01_231823) do
+ActiveRecord::Schema.define(version: 2020_03_02_011353) do
 
   create_table "cards", force: :cascade do |t|
+    t.integer "game_id"
     t.string "suit"
     t.string "rank"
     t.string "location"
-    t.integer "game_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -28,10 +28,10 @@ ActiveRecord::Schema.define(version: 2020_03_01_231823) do
   end
 
   create_table "players", force: :cascade do |t|
-    t.string "ai"
-    t.string "username"
     t.integer "game_id"
     t.integer "user_id"
+    t.string "ai"
+    t.string "username"
     t.string "location"
     t.integer "money"
     t.datetime "created_at", precision: 6, null: false
@@ -41,7 +41,6 @@ ActiveRecord::Schema.define(version: 2020_03_01_231823) do
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "password"
-    t.string "player"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"

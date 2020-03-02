@@ -25,9 +25,6 @@ class PlayersController < ApplicationController
   # POST /players.json
   def create
     @player = Player.new(player_params)
-    if @player.user.ai = nil
-      @player.user.currentPlayer = @player
-    end
     redirect_to '/'
   end
 
@@ -68,6 +65,6 @@ class PlayersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def player_params
-      params.require(:player).permit(:ai, :username, :game, :location)
+      params.require(:player).permit(:ai, :username, :location, :money, :game_id, :user_id)
     end
 end
