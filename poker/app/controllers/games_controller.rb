@@ -9,21 +9,17 @@ class GamesController < ApplicationController
 
   # GET /games/1
   # GET /games/1.json
+  # a game window should add the user who visits it as a player
+  # TODO: move game logic
   def show
     if logged_in?
       in_game = false
       @game.players.each do |p|
-        p p
         if p.user_id == current_user.id
-          p "BRUHHHHH"
-          p p
-          p p.user_id
-          p current_user.id
           in_game = true
         end
       end
       if not in_game
-        p "BRUHH"
         @game.add_user_player(current_user)
       end
     end
