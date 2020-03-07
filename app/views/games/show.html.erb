@@ -8,13 +8,21 @@
 hi. <br/>
 <%= Card.find(1).rank %>
 <%= Card.find(1).suit %>
+
+<%= @game.instance_variables %>
 <br/> <br/>
 
 Players: <br/>
 <% @game.players.each do |player| %>
-  <%= player.username %>
-  says hello <br/>
+  <%= player.username %>  <%= player.location %><br/>
+<%end%> <br/>
+
+Cards: <br/>
+<% @game.cards.each do |card| %>
+  <%=card.rank%><%=card.suit %>
 <%end%>
+
+<%= button_to 'Draw a card', 'move_card', params:{game: @game.id, origin: 'deck', destination: @user} %>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
