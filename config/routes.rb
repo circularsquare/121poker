@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   post 'login', to: 'sessions#create'
   delete 'logout', to: 'sessions#destroy'
   get 'logout', to: 'sessions#destroy'
+  post 'games/add_ai', to: 'games#add_ai'
+  post 'games/add_player', to: 'games#add_player'
 
   #created by andrew while learning rails 2/13, see app/controllers/cards_controller.rb
   resources :games

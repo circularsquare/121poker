@@ -27,8 +27,10 @@ class Game < ApplicationRecord
   end
 
   # creates ai player under the current game and the user who made it
-  def add_ai_player()
-    Player.create({:ai => 'ai 1', :game => self, :username => 'ai', :user => user, :location => 'new ai player'})
+  def add_ai_player(type, user)
+    @player = Player.new({:ai => type, :game_id => self.id, :user_id => user.id, :money => 0, :username => 'ai 1', :location => 'new player'})
+    self.players << @player
+    self.save
   end
 
 end

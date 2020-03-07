@@ -12,17 +12,7 @@ class GamesController < ApplicationController
   # a game window should add the user who visits it as a player
   # TODO: move game logic
   def show
-    if logged_in?
-      in_game = false
-      @game.players.each do |p|
-        if p.user_id == current_user.id
-          in_game = true
-        end
-      end
-      if not in_game
-        @game.add_user_player(current_user)
-      end
-    end
+
   end
 
   # GET /games/new
@@ -78,6 +68,14 @@ class GamesController < ApplicationController
     end
   end
 
+  def add_ai
+    Game.find_by(id: params[:game]).add_ai_player(params[:type], User.find_by(id: params[:user].to_i))
+  end
+
+  def add_player
+    Game.find_by(id: params[:game]).add_user_player(User.find_by(id: params[:user].to_i))
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_game
@@ -86,6 +84,6 @@ class GamesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def game_params
-      params.require(:game).permit(:room_name)
+      params.permit(:room_name)
     end
 end

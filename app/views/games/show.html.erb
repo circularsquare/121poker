@@ -16,7 +16,8 @@ Players: <br/>
   says hello <br/>
 <%end%>
 
-<%= button_to 'Add AI', player_path, method: :create %> <!-- this should probably just redirect you to a new players form -->
+<%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
+<%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
 
 <%= link_to 'Edit', edit_game_path(@game) %> <br/>
 <%= link_to 'Back', games_path %><br/>
