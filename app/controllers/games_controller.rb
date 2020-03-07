@@ -27,8 +27,7 @@ class GamesController < ApplicationController
   # POST /games
   # POST /games.json
   def create
-    @game = Game.new(game_params)
-
+    @game.init
     respond_to do |format|
       if @game.save
         format.html { redirect_to @game, notice: 'Game was successfully created.' }
@@ -76,6 +75,14 @@ class GamesController < ApplicationController
     Game.find_by(id: params[:game]).add_user_player(User.find_by(id: params[:user].to_i))
   end
 
+  def move_card
+
+  end
+
+  def action
+
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_game
@@ -84,6 +91,6 @@ class GamesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def game_params
-      params.permit(:room_name)
+      params.require(:game).permit(:room_name)
     end
 end
