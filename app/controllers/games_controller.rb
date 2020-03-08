@@ -1,6 +1,7 @@
 class GamesController < ApplicationController
   before_action :set_game, only: [:show, :edit, :update, :destroy]
 
+
   # GET /games
   # GET /games.json
   def index
@@ -9,7 +10,6 @@ class GamesController < ApplicationController
 
   # GET /games/1
   # GET /games/1.json
-  # a game window should add the user who visits it as a player
   # TODO: move game logic
   def show
 
@@ -27,6 +27,7 @@ class GamesController < ApplicationController
   # POST /games
   # POST /games.json
   def create
+    @game = Game.create(game_params)
     @game.init
     respond_to do |format|
       if @game.save
@@ -69,19 +70,22 @@ class GamesController < ApplicationController
 
   def add_ai
     Game.find_by(id: params[:game]).add_ai_player(params[:type], User.find_by(id: params[:user].to_i))
+    redirect_back(fallback_location: root_path)
   end
 
   def add_player
     Game.find_by(id: params[:game]).add_user_player(User.find_by(id: params[:user].to_i))
+    redirect_back(fallback_location: root_path)
   end
-
   def move_card
-
+    Game.find(params[:game]).move_card(Card.find(params[:card]), params[:destination])
+    redirect_back(fallback_location: root_path)
   end
-
   def action
 
+    redirect_back(fallback_location: root_path)
   end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
