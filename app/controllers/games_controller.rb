@@ -72,7 +72,6 @@ class GamesController < ApplicationController
     Game.find_by(id: params[:game]).add_ai_player(params[:type], User.find_by(id: params[:user].to_i))
     redirect_back(fallback_location: root_path)
   end
-
   def add_player
     Game.find_by(id: params[:game]).add_user_player(User.find_by(id: params[:user].to_i))
     redirect_back(fallback_location: root_path)
@@ -82,10 +81,16 @@ class GamesController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
   def action
-
     redirect_back(fallback_location: root_path)
   end
-
+  def deal
+    Game.find_by(id: params[:game]).deal(params[:round])
+    redirect_back(fallback_location: root_path)
+  end
+  def set_round
+    Game.find_by(id: params[:game]).set_round(params[:round])
+    redirect_back(fallback_location: root_path)
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
