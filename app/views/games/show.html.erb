@@ -17,6 +17,12 @@ Players: <br/>
   <br/>
 <%end%> <br/>
 
+Table: <br/>
+<% get_table_cards(@game).each do |card| %>
+  <%= card.suit %><%= card.rank %>
+<%end%>
+<br/>
+
 Game round: <%= @game.round %> <br/>
 
 Deck: <br/>
@@ -24,14 +30,35 @@ Deck: <br/>
   <%=card.rank%><%=card.suit %>
 <%end%>
 
+
+
 <% if in_game(current_user, @game) %>
   <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
 <% end %>
 
 <% if in_game(current_user, @game) %>
-  <%= button_to 'set round to 0', 'set_round', params:{game: @game.id, round: 0} %>
+  <%= button_to 'increment round', 'set_round', params:{game: @game.id, round: (@game.round+1)%5} %>
   <%= button_to 'Draw a card', 'move_card', params:{game: @game.id, card: get_random_card(@game), destination: get_player(current_user, @game).location} %>
 <%end%>
+
+<br/>
+
+<% if in_game(current_user, @game) %>
+  <%= button_to 'fold', 'action', params:{game: @game.id, action: 'fold'} %>
+  <%= button_to 'call', 'action', params:{game: @game.id, action: 'call'} %>
+  <%= button_to 'check', 'action', params:{game: @game.id, action: 'check'} %>
+  <%= form_with(url: "action", method: 'post', params:{game: @game.id, action: 'bet'}) do %>
+    <%= number_field_tag(:amount) %>
+    <%= submit_tag("bet") %>
+  <% end %>
+  <%= form_with(url: "action", method: 'post', params:{game: @game.id, action: 'raise'}) do %>
+    <%= number_field_tag(:amount) %>
+    <%= submit_tag("raise") %>
+  <% end %>
+<%end%> <br/>
+
+
+
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>

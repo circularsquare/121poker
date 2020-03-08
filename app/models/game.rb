@@ -37,16 +37,35 @@ class Game < ApplicationRecord
       move_card(get_random_card, 0)
     when 3
       move_card(get_random_card, 0)
+    when 4
+      reset_cards()
     else
       p '###deal case > 3, error###'
       p round
     end
   end
 
+  def action(type, amount)
+    case type
+    when 'fold'
+    when 'bet'
+    when 'raise'
+    when 'check'
+    when 'call'
+    else
+      p 'invalid action'
+    end
+  end
   # locations are deck, table, or players
   def move_card(card, destination)
     card.location = destination
     card.save
+  end
+  def reset_cards()
+    self.cards.where.not(:location => -1).each do |card|
+      card.location = -1
+      card.save
+    end
   end
 
   def change_position
@@ -61,14 +80,14 @@ class Game < ApplicationRecord
 
   # creates player under the current game and the specified user
   def add_user_player(user)
-    @player = Player.new({:ai => '', :game_id => self.id, :user_id => user.id, :money => 0, :username => user.username, :location => 1})
+    @player = Player.new({:ai => '', :game_id => self.id, :user_id => user.id, :money => 0, :username => user.username, :location => self.players.length+10})
     self.players << @player
     self.save
   end
 
   # creates ai player under the current game and the user who made it
   def add_ai_player(type, user)
-    @player = Player.new({:ai => type, :game_id => self.id, :user_id => user.id, :money => 0, :username => 'ai 1', :location => 1})
+    @player = Player.new({:ai => type, :game_id => self.id, :user_id => user.id, :money => 0, :username => 'ai 1', :location => self.players.length+10})
     self.players << @player
     self.save
   end

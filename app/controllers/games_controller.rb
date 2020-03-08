@@ -81,6 +81,7 @@ class GamesController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
   def action
+    Game.find(params[:game]).action(params[:action], params[:amount])    
     redirect_back(fallback_location: root_path)
   end
   def deal
@@ -97,7 +98,6 @@ class GamesController < ApplicationController
     def set_game
       @game = Game.find(params[:id])
     end
-
     # Only allow a list of trusted parameters through.
     def game_params
       params.require(:game).permit(:room_name)
