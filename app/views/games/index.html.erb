@@ -1,28 +1,27 @@
 <p id="notice"><%= notice %></p>
 
 <h1>Games</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Room name</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
+<div class="container">
+  <div class="table">
+    <div class="table-header">
+      <div class="header__item"> room name </div>
+      <div class="header__item"> players </div>
+      <div class="header__item"> </div>
+      <div class="header__item"> </div>
+      <div class="header__item"> </div>
+    </div>
     <% @games.each do |game| %>
-      <tr>
-        <td><%= game.room_name %></td>
-        <td><%= game.players[0] %> </td>
-        <td><%= link_to 'Show', game %></td>
-        <td><%= link_to 'Edit', edit_game_path(game) %></td>
-        <td><%= link_to 'Destroy', game, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+      <div class="table-row">
+        <div class='table-data'> <%= game.room_name %></div>
+        <div class='table-data'> <%= game.players.length %></div>
+        <div class='table-data'> <%= link_to 'Show', game%></div>
+        <div class='table-data'> <%= link_to 'Edit', edit_game_path(game) %></div>
+        <div class='table-data'> <%= link_to 'Destroy', game, method: :delete, data: {confirm: 'r u sure' }%></div>
+      </div>
+    <%end%>
+  </div>
+</div>
 
-<br>
+
 
 <%= link_to 'New Game', new_game_path %>
