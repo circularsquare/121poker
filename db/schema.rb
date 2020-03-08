@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
 
   create_table "games", force: :cascade do |t|
     t.string "room_name"
-    t.integer "next_to_play" #keeps track of which location is next to play
-    t.integer "round" #0 is preflop, 1 is flop, 2 is turn, 3 is river, 4 is final round
+    t.integer "next_to_play"
+    t.integer "round"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

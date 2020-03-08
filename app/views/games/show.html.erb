@@ -17,12 +17,19 @@ Players: <br/>
   <br/>
 <%end%> <br/>
 
+Game round: <%= @game.round %> <br/>
+
 Deck: <br/>
 <% @game.cards.each do |card| %>
   <%=card.rank%><%=card.suit %>
 <%end%>
 
 <% if in_game(current_user, @game) %>
+  <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
+<% end %>
+
+<% if in_game(current_user, @game) %>
+  <%= button_to 'set round to 0', 'set_round', params:{game: @game.id, round: 0} %>
   <%= button_to 'Draw a card', 'move_card', params:{game: @game.id, card: get_random_card(@game), destination: get_player(current_user, @game).location} %>
 <%end%>
 
