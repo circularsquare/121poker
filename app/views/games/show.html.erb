@@ -5,24 +5,26 @@
   <%= @game.room_name %>
 </p>
 
-hi. <br/>
-<%= Card.find(1).rank %>
-<%= Card.find(1).suit %>
-
-<%= @game.instance_variables %>
+hi.
 <br/> <br/>
 
 Players: <br/>
 <% @game.players.each do |player| %>
-  <%= player.username %>  <%= player.location %><br/>
+  <%= player.username %>  <%= player.location %>
+    <% get_players_cards(player, @game).each do |card| %>
+      <%= card.suit %><%= card.rank %>
+    <%end%>
+  <br/>
 <%end%> <br/>
 
-Cards: <br/>
+Deck: <br/>
 <% @game.cards.each do |card| %>
   <%=card.rank%><%=card.suit %>
 <%end%>
 
-<%= button_to 'Draw a card', 'move_card', params:{game: @game.id, origin: 'deck', destination: @user} %>
+<% if in_game(current_user, @game) %>
+  <%= button_to 'Draw a card', 'move_card', params:{game: @game.id, card: get_random_card(@game), destination: get_player(current_user, @game).location} %>
+<%end%>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>

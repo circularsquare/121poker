@@ -14,15 +14,18 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
 
   create_table "cards", force: :cascade do |t|
     t.integer "game_id"
+    t.integer "player_id"
     t.string "suit"
     t.string "rank"
-    t.string "location"
+    t.integer "location"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "games", force: :cascade do |t|
     t.string "room_name"
+    t.integer "next_to_play" #keeps track of which location is next to play
+    t.integer "round" #0 is preflop, 1 is flop, 2 is turn, 3 is river, 4 is final round
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -32,7 +35,7 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
     t.integer "user_id"
     t.string "ai"
     t.string "username"
-    t.string "location"
+    t.integer "location"
     t.integer "money"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -41,6 +44,7 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "password"
+    t.integer "money"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "password_digest"
