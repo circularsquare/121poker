@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_02_011353) do
+ActiveRecord::Schema.define(version: 2020_03_28_192858) do
 
   create_table "cards", force: :cascade do |t|
     t.integer "game_id"
@@ -28,6 +28,11 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
     t.integer "round"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "pot"
+    t.integer "high_bet"
+    t.integer "current_player"
+    t.integer "high_better"
+    t.integer "dealer"
   end
 
   create_table "players", force: :cascade do |t|
@@ -39,6 +44,9 @@ ActiveRecord::Schema.define(version: 2020_03_02_011353) do
     t.integer "money"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "in_hand"
+    t.integer "in_pot_current"
+    t.integer "in_pot_hand"
   end
 
   create_table "users", force: :cascade do |t|

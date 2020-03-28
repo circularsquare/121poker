@@ -81,7 +81,8 @@ class GamesController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
   def action
-    Game.find(params[:game]).action(params[:action], params[:amount])    
+    Game.find_by(id: params[:game]).action(params[:type], params[:amount], params[:player])
+    p params    
     redirect_back(fallback_location: root_path)
   end
   def deal
@@ -90,6 +91,10 @@ class GamesController < ApplicationController
   end
   def set_round
     Game.find_by(id: params[:game]).set_round(params[:round])
+    redirect_back(fallback_location: root_path)
+  end
+  def leave_game
+    Game.find_by(id: params[:game]).leave_game(params[:player])
     redirect_back(fallback_location: root_path)
   end
 
