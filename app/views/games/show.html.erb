@@ -15,6 +15,8 @@ Players: <br/>
       <%= card.suit %><%= card.rank %>
     <%end%>
   <br/>
+  <%= player.money %>
+  <br/>
 <%end%> <br/>
 
 Table: <br/>
@@ -30,7 +32,14 @@ Deck: <br/>
   <%=card.rank%><%=card.suit %>
 <%end%>
 
-
+<br/>
+<%= @game.pot %>
+<br/>
+Dealer <%= @game.dealer%>
+<br/>
+Current player <%= @game.current_player%>
+<br/>
+High better <%= @game.high_better%>
 
 <% if in_game(current_user, @game) %>
   <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
@@ -44,14 +53,17 @@ Deck: <br/>
 <br/>
 
 <% if in_game(current_user, @game) %>
-  <%= button_to 'fold', 'action', params:{game: @game.id, action: 'fold'} %>
-  <%= button_to 'call', 'action', params:{game: @game.id, action: 'call'} %>
-  <%= button_to 'check', 'action', params:{game: @game.id, action: 'check'} %>
-  <%= form_with(url: "action", method: 'post', params:{game: @game.id, action: 'bet'}) do %>
+  <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
+  <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %>
+  <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %>
+  <%= form_with(url: "action", method: 'post') do %>
+    <%= hidden_field_tag(:game, @game.id) %>
+    <%= hidden_field_tag(:type, 'bet') %>
+    <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
     <%= number_field_tag(:amount) %>
     <%= submit_tag("bet") %>
   <% end %>
-  <%= form_with(url: "action", method: 'post', params:{game: @game.id, action: 'raise'}) do %>
+  <%= form_with(url: "action", method: 'post', params:{game: @game.id, type: 'raise', player: get_player(current_user, @game)}) do %>
     <%= number_field_tag(:amount) %>
     <%= submit_tag("raise") %>
   <% end %>
@@ -62,6 +74,7 @@ Deck: <br/>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
+<%= button_to 'Leave Game', 'leave_game', params:{game: @game.id, player: get_player(current_user, @game)}%>
 
 <%= link_to 'Edit', edit_game_path(@game) %> <br/>
 <%= link_to 'Back', games_path %><br/>
