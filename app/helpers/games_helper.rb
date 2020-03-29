@@ -1,6 +1,7 @@
 module GamesHelper
   def get_player(user, game)
-    return game.players.where(:user => user)[0]
+
+    return game.players.where(:user => user, :ai => "")[0]
   end
   def get_players_cards(player, game)
     return game.cards.where(:location.to_s => player.location.to_s)
