@@ -7,7 +7,7 @@ class Game < ApplicationRecord
   end
 
   def init
-    self.round = -1
+    self.round = 0
     ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
     suits = ['S', 'H', 'C', 'D']
     self.pot = 0
@@ -44,7 +44,7 @@ class Game < ApplicationRecord
       move_card(get_random_card, 0)
     when 4
       p 'Round 4'
-      reset_game()
+      reset_game(get_winner())
     else
       p '###deal case > 3, error###'
       p round
@@ -65,31 +65,21 @@ class Game < ApplicationRecord
     go_once_around = true
     player = get_player(self.current_player)
 
-    p 'bruh'
-    p self.high_better
-    p self.current_player
-    p player.ai
-    p 'cccccccccccccccccccccc'
-
     while ((not self.high_better == self.current_player) or go_once_around) and get_player(self.current_player).ai != ""
       go_once_around = false
       action_info = ai_action(player)
-      p action_info
       action(action_info[0], action_info[1], player.id)
       player = get_player(self.current_player)
-      p 'aaaaaaaaaaaaaaaaaaaaa'
-      p self.current_player
-      p player.ai
-      p 'bbbbbbbbbbbbbbbbbbbbbbbb'
-
-      if self.players.where(:in_hand => true).length == 1
-        return 0
-      end
     end
 
     if self.high_better == self.current_player
       set_round(self.round + 1 % 5)
       deal(self.round)
+    end
+
+    if self.players.where(:in_hand => true).length == 1
+      reset_game(self.players.where(:in_hand => true)[0])
+      p 'resettttttttttt'
     end
 
     self.save
@@ -141,11 +131,16 @@ class Game < ApplicationRecord
     end
     @player.in_pot_current += amount
     @player.in_pot_hand += amount
-
     self.current_player = get_next_player(self.current_player)
-
     self.save
     @player.save
+
+    if self.players.where(:in_hand => true).length == 1
+      p 'bruhhhhhhhhhhhhhhhhhhhhhhhhh'
+      p self.players.where(:in_hand => true)[0].username
+      reset_game(self.players.where(:in_hand => true)[0])
+    end
+
   end
 
   def player_action(type, amount, player)
@@ -156,7 +151,7 @@ class Game < ApplicationRecord
     type = player.ai
     if self.high_bet == 0
       return 'check', 0
-    elsif self.high_bet < player.money
+    elsif self.high_bet < player.money/2
       return 'call', self.high_bet
     else
       return 'fold', 0
@@ -169,7 +164,11 @@ class Game < ApplicationRecord
     card.save
   end
 
-  def reset_game()
+  def get_winner()
+    players = self.players.where(:in_game == true)
+    return players[0]
+  end
+  def reset_game(winner)
     # reset deck of cards
     self.cards.where.not(:location => -1).each do |card|
       card.location = -1
@@ -182,11 +181,14 @@ class Game < ApplicationRecord
       player.save
     end
     # reset pot to empty, increment dealer
+    winner.money += self.pot
+    winner.save
     self.pot = 0
     self.dealer = (self.dealer + 1)%10 + 10
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
+    self.round = 0
   end
 
   def set_round(round)
