@@ -11,8 +11,9 @@ hi.
 Players: <br/>
 <% @game.players.each do |player| %>
   <%= player.username %>  <%= player.location %>
+  <% if player.in_hand %> in hand <%else%> folded <%end%>
     <% get_players_cards(player, @game).each do |card| %>
-      <%= card.suit %><%= card.rank %>
+      <%= card.rank %><%= card.suit %>
     <%end%>
   <br/>
   <%= player.money %>
@@ -29,11 +30,13 @@ Game round: <%= @game.round %> <br/>
 
 Deck: <br/>
 <% @game.cards.each do |card| %>
-  <%=card.rank%><%=card.suit %>
+  <% if card.location == -1 %>
+    <%=card.rank%><%=card.suit %>
+  <% end %>
 <%end%>
 
 <br/>
-<%= @game.pot %>
+Pot: <%= @game.pot %>
 <br/>
 Dealer <%= @game.dealer%>
 <br/>
@@ -53,24 +56,26 @@ High better <%= @game.high_better%>
 <br/>
 
 <% if in_game(current_user, @game) %>
-  <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
-  <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %>
-  <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %>
-  <%= form_with(url: "action", method: 'post') do %>
-    <%= hidden_field_tag(:game, @game.id) %>
-    <%= hidden_field_tag(:type, 'bet') %>
-    <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
-    <%= number_field_tag(:amount) %>
-    <%= submit_tag("bet") %>
-  <% end %>
-  <%= form_with(url: "action", method: 'post', params:{game: @game.id, type: 'raise', player: get_player(current_user, @game)}) do %>
-    <%= number_field_tag(:amount) %>
-    <%= submit_tag("raise") %>
+  <% if get_player(current_user, @game) == @game.current_player %>
+    <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
+    <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %>
+    <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %>
+    <%= form_with(url: "action", method: 'post') do %>
+      <%= hidden_field_tag(:game, @game.id) %>
+      <%= hidden_field_tag(:type, 'bet') %>
+      <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
+      <%= number_field_tag(:amount) %>
+      <%= submit_tag("bet") %>
+    <% end %>
+    <%= form_with(url: "action", method: 'post') do %>
+      <%= hidden_field_tag(:game, @game.id) %>
+      <%= hidden_field_tag(:type, 'bet') %>
+      <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
+      <%= number_field_tag(:amount) %>
+      <%= submit_tag("raise") %>
+    <% end %>
   <% end %>
 <%end%> <br/>
-
-
-
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
