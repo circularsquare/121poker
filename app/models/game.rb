@@ -53,28 +53,45 @@ class Game < ApplicationRecord
       player.in_pot_current = 0
     end
     self.high_bet = 0
+    self.high_better = self.current_player
     self.save
-    action_loop()
+    if get_player(self.current_player).ai != ''
+      action_loop()
+    end
+    self.save
   end
 
   def action_loop()
-
-
-    self.high_better = self.current_player
     go_once_around = true
-    while (not self.high_better == self.current_player) or go_once_around
+    player = get_player(self.current_player)
+
+    p 'bruh'
+    p self.high_better
+    p self.current_player
+    p player.ai
+    p 'cccccccccccccccccccccc'
+
+    while ((not self.high_better == self.current_player) or go_once_around) and get_player(self.current_player).ai != ""
       go_once_around = false
+      action_info = ai_action(player)
+      p action_info
+      action(action_info[0], action_info[1], player.id)
       player = get_player(self.current_player)
-      if player.ai != ""
-        action_info = ai_action(player)
-        action(action_info[0], action_info[1], player.id)
-      end
-      self.current_player = get_next_player(self.current_player)
+      p 'aaaaaaaaaaaaaaaaaaaaa'
+      p self.current_player
+      p player.ai
+      p 'bbbbbbbbbbbbbbbbbbbbbbbb'
 
       if self.players.where(:in_hand => true).length == 1
         return 0
       end
     end
+
+    if self.high_better == self.current_player
+      set_round(self.round + 1 % 5)
+      deal(self.round)
+    end
+
     self.save
   end
   #handles player actions
@@ -96,7 +113,7 @@ class Game < ApplicationRecord
         @player.money -= amount
         self.pot += amount
         self.high_bet = amount + @player.in_pot_current
-        self.high_better = player
+        self.high_better = @player.location
       end
     when 'raise'
       if amount > @player.money
@@ -108,14 +125,14 @@ class Game < ApplicationRecord
         @player.money -= amount
         self.pot += amount
         self.high_bet = amount + @player.in_pot_current
-        self.high_better = player
+        self.high_better = @player.location
       end
     when 'check'
     when 'call'
-      if high_bet > @player.money
+      if high_bet > @player.money + @player.in_pot_current
         amount = @player.money
       else
-        amount = high_bet
+        amount = high_bet - @player.in_pot_current
       end
       self.pot += amount
       @player.money -= amount
@@ -125,18 +142,25 @@ class Game < ApplicationRecord
     @player.in_pot_current += amount
     @player.in_pot_hand += amount
 
+    self.current_player = get_next_player(self.current_player)
+
     self.save
     @player.save
   end
 
+  def player_action(type, amount, player)
+    action(type, amount, player)
+    action_loop()
+  end
   def ai_action(player)
     type = player.ai
-    if self.high_bet < player.money
-      return 'fold', 1
+    if self.high_bet == 0
+      return 'check', 0
+    elsif self.high_bet < player.money
+      return 'call', self.high_bet
     else
-      return 'fold', 1
+      return 'fold', 0
     end
-
   end
 
   # locations are deck, table, or players
@@ -154,6 +178,8 @@ class Game < ApplicationRecord
     # reset amount each player has in the pot to 0
     self.players.each do |player|
       player.in_pot_hand = 0
+      player.in_pot_current = 0
+      player.save
     end
     # reset pot to empty, increment dealer
     self.pot = 0
@@ -161,11 +187,6 @@ class Game < ApplicationRecord
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
-  end
-
-  def change_position
-    @card = Card.find(1)
-    @card.location = 'deck[placeholder]'
   end
 
   def set_round(round)

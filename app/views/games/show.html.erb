@@ -16,9 +16,13 @@ Players: <br/>
       <%= card.rank %><%= card.suit %>
     <%end%>
   <br/>
-  <%= player.money %>
+  money: <%= player.money %>, in the round: <%= player.in_pot_current %>
   <br/>
 <%end%> <br/>
+
+high bet: <%= @game.high_bet %>
+
+<br/> <br/>
 
 Table: <br/>
 <% get_table_cards(@game).each do |card| %>
@@ -44,19 +48,22 @@ Current player <%= @game.current_player%>
 <br/>
 High better <%= @game.high_better%>
 
-<% if in_game(current_user, @game) %>
-  <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
+<% if @game.round == 0 %>
+  <% if in_game(current_user, @game) %>
+    <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
+  <% end %>
 <% end %>
 
 <% if in_game(current_user, @game) %>
-  <%= button_to 'increment round', 'set_round', params:{game: @game.id, round: (@game.round+1)%5} %>
-  <%= button_to 'Draw a card', 'move_card', params:{game: @game.id, card: get_random_card(@game), destination: get_player(current_user, @game).location} %>
+  <% if @game.round == -1 or @game.round == 4 %>
+    <%= button_to 'start round', 'set_round', params:{game: @game.id, round: (@game.round+1)%5} %>
+  <% end %>
 <%end%>
 
 <br/>
 
 <% if in_game(current_user, @game) %>
-  <% if get_player(current_user, @game) == @game.current_player %>
+  <% if get_player(current_user, @game).location == @game.current_player %>
     <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
     <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %>
     <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %>
