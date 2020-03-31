@@ -61,6 +61,7 @@ class Game < ApplicationRecord
     self.save
   end
 
+  # Automates taking actions for each AI, advances round and deals under correct conditions
   def action_loop()
     go_once_around = true
     player = get_player(self.current_player)
@@ -79,12 +80,11 @@ class Game < ApplicationRecord
 
     if self.players.where(:in_hand => true).length == 1
       reset_game(self.players.where(:in_hand => true)[0])
-      p 'resettttttttttt'
     end
-
     self.save
   end
-  #handles player actions
+
+  # handles player actions
   def action(type, amount, player)
     @player = Player.find(player.to_i)
     amount = amount.to_i
@@ -143,10 +143,13 @@ class Game < ApplicationRecord
 
   end
 
+  # helper function to run when a user needs to take a turn
   def player_action(type, amount, player)
     action(type, amount, player)
     action_loop()
   end
+
+  # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
     type = player.ai
     if self.high_bet == 0
@@ -168,6 +171,9 @@ class Game < ApplicationRecord
     players = self.players.where(:in_game == true)
     return players[0]
   end
+
+  # At the end of a round, this is called to reset card deck, correctly allocate the round's money,
+  # and increment the dealer
   def reset_game(winner)
     # reset deck of cards
     self.cards.where.not(:location => -1).each do |card|
