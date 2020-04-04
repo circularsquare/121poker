@@ -7,7 +7,7 @@ class Game < ApplicationRecord
   end
 
   def init
-    self.round = 0
+    self.round = -1
     ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
     suits = ['S', 'H', 'C', 'D']
     self.pot = 0
@@ -43,7 +43,7 @@ class Game < ApplicationRecord
     when 3
       move_card(get_random_card, 0)
     when 4
-      reset_game()
+      end_game()
     else
       p '###deal case > 3, error###'
       p round
@@ -78,7 +78,7 @@ class Game < ApplicationRecord
     end
 
     if self.players.where(:in_hand => true).length == 1
-      reset_game()
+      end_game()
     end
     self.save
   end
@@ -137,7 +137,7 @@ class Game < ApplicationRecord
     if self.players.where(:in_hand => true).length == 1
       p 'bruhhhhhhhhhhhhhhhhhhhhhhhhh'
       p self.players.where(:in_hand => true)[0].username
-      reset_game(self.players.where(:in_hand => true)[0])
+      end_game()
     end
 
   end
@@ -168,7 +168,7 @@ class Game < ApplicationRecord
 
   def get_winners()
     scoreToString = {1=>'high card', 2=>'pair', 3=>'two pair', 4=>'three of a kind', 5=>'straight', 6=>'flush', 7=>'full house', 8=>'four of a kind', 9=>'straight flush', 10=>'royal flush'}
-    high_score = -2
+    high_score = -100^7
     winners = []
     players = self.players.where(:in_game == true)
     players.each do |player|
@@ -176,11 +176,15 @@ class Game < ApplicationRecord
       if cards.length() == 7
         handjudge = Handjudge.new(cards)
         player.score = handjudge.judge()
-        player.hand = scoreToString[player.score[0]]
+        p 'scoreeeeeeeeeeeeeeee'
+        p player.score
+        p 'scorrererer'
+        player.hand = scoreToString[(player.score.to_f/(100**5)).round()]
+        p player.hand
         player.save
         if player.score > high_score
           high_score = player.score
-          winners.append(player)
+          winners = [player]
         elsif player.score == high_score
           winners.append(player)
         end
@@ -193,9 +197,9 @@ class Game < ApplicationRecord
   end
 
   def end_game()
-
-    set_round(0)
+    get_winners()
   end
+
   # At the end of a round, this is called to reset card deck, correctly allocate the round's money,
   # and increment the dealer
   def reset_game()
@@ -230,6 +234,7 @@ class Game < ApplicationRecord
       self.dealer = (self.dealer + 1)%10 + 10
     end
     set_round(0)
+    deal(0)
     self.save
   end
 
