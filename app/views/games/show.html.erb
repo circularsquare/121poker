@@ -56,7 +56,7 @@ High better <%= @game.high_better%>
 
 <% if in_game(current_user, @game) %>
   <% if @game.round == -1 or @game.round == 4 %>
-    <%= button_to 'start round', 'set_round', params:{game: @game.id, round: (@game.round+1)%5} %>
+    <%= button_to 'start round', 'reset_game', params:{game: @game.id} %>
   <% end %>
 <%end%>
 
