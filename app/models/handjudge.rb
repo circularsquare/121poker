@@ -1,6 +1,6 @@
 class Handjudge
 
-    def init(cards)
+    def initialize(cards)
         @cards = cards
         judge()
     end
@@ -13,12 +13,19 @@ class Handjudge
         for i in 0...7
             card = @cards[i]
             # put string information for cards into format for array
-            map_rank = strToRank[:card.rank]
-            map_suit = strToSuit[:card.suit]
+            map_rank = strToRank[card.rank]
+            map_suit = strToSuit[card.suit]
             # increment appropriate array counts for each card
             @ranks[map_rank] += 1
             @suits[map_suit] += 1
         end
+
+        # first entry corresponds to general case (royal_flush being 10 to high_card being 1)
+        # other entries are tiebreakers
+        @score = [-1, -1, -1, -1, -1, -1]
+
+
+        return -1
     end
 
     def royal_flush?
@@ -28,24 +35,22 @@ class Handjudge
     end
 
     def four_of_a_kind?
-        @four_card = -1
         for i in 0...13
             if @ranks[i] == 4
-                @four_card = i
-                return true
+                return [8, i, -1, -1, -1, -1] # todo: get other card
             end
         end
         return false
     end
-    
+
     def full_house?
-        @full_house_pair = -1
-        if three_of_a_kind
+        if three_of_a_kind?
+            triple_high = three_of_a_kind?[1]
             (12).downto(0) do |i|
                 if @ranks[i] >= 2
-                    if i != @triple_high
-                        @full_house_pair = i
+                    if i != triple_high
                         return true
+                        return [7, triple_high, i, -1, -1, -1]
                     end
                 end
             end
@@ -54,10 +59,19 @@ class Handjudge
     end
 
     def flush?
+       strToSuit = {'S'=>0, 'H'=>1, 'C'=>2, 'D'=>3}
+       strToRank = {'2'=>0, '3'=>1, '4'=>2, '5'=>3, '6'=>4, '7'=>5, '8'=>6, '9'=>7, '10'=>8, 'J'=>9, 'Q'=>10, 'K'=>11, 'A'=>12}
        @suits.each do |suit|
            if suit >= 5
-            return true
-           end 
+             score = [6]
+             suited_cards = @cards.where(strToSuit[:suit] => suit).sort_by { |card| card.rank }
+             (suited_cards.length()).downto(0) do |i|
+               if score.length() < 6
+                 score.append(suited_cards[i].rank)
+               end
+             end
+             return score
+           end
        end
        return false
     end
@@ -149,9 +163,9 @@ class Handjudge
 
     def empty_hand?
     end
-  
 
-    OPS = [
+
+    "OPS = [
         ['Royal Flush',     :royal_flush? ],
         ['Straight Flush',  :straight_flush? ],
         ['Four of a kind',  :four_of_a_kind? ],
@@ -163,8 +177,9 @@ class Handjudge
         ['Pair',            :pair? ],
         ['Highest Card',    :highest_card? ],
         ['Empty Hand',      :empty_hand? ],
-      ]
-    
+
+      end"
+
       # Returns the verbose hand rating
       #
       #     PokerHand.new("4s 5h 6c 7d 8s").hand_rating     # => "Straight"
@@ -173,5 +188,5 @@ class Handjudge
           (method(op[1]).call()) ? op[0] : false
         }.find { |v| v }
       end
-    
-end  
+    end
+end

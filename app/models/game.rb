@@ -43,8 +43,7 @@ class Game < ApplicationRecord
     when 3
       move_card(get_random_card, 0)
     when 4
-      p 'Round 4'
-      reset_game(get_winner())
+      reset_game()
     else
       p '###deal case > 3, error###'
       p round
@@ -79,7 +78,7 @@ class Game < ApplicationRecord
     end
 
     if self.players.where(:in_hand => true).length == 1
-      reset_game(self.players.where(:in_hand => true)[0])
+      reset_game()
     end
     self.save
   end
@@ -167,14 +166,52 @@ class Game < ApplicationRecord
     card.save
   end
 
-  def get_winner()
+  def get_winners()
+    scoreToString = {1=>'high card', 2=>'pair', 3=>'two pair', 4=>'three of a kind', 5=>'straight', 6=>'flush', 7=>'full house', 8=>'four of a kind', 9=>'straight flush', 10=>'royal flush'}
+    high_score = -2
+    winners = []
     players = self.players.where(:in_game == true)
-    return players[0]
+    players.each do |player|
+      cards = self.cards.where(:location => player.location) + self.cards.where(:location => 0)
+      if cards.length() == 7
+        handjudge = Handjudge.new(cards)
+        player.score = handjudge.judge()
+        player.hand = scoreToString[player.score[0]]
+        player.save
+        if player.score > high_score
+          high_score = player.score
+          winners.append(player)
+        elsif player.score == high_score
+          winners.append(player)
+        end
+      else
+        p 'invalid number of cards passed'
+        return players
+      end
+    end
+    return winners
   end
 
+  def end_game()
+
+    set_round(0)
+  end
   # At the end of a round, this is called to reset card deck, correctly allocate the round's money,
   # and increment the dealer
-  def reset_game(winner)
+  def reset_game()
+
+    while (self.pot > 0)
+      #gets people with highest score
+      winners = get_winners()
+      winners.each do |winner|
+        #TO IMPLEMENT: more advanced side pots
+        winner.money += self.pot / winners.length()
+        winner.save
+      end
+      self.pot = 0
+      print(winners)
+    end
+
     # reset deck of cards
     self.cards.where.not(:location => -1).each do |card|
       card.location = -1
@@ -187,21 +224,17 @@ class Game < ApplicationRecord
       player.save
     end
     # reset pot to empty, increment dealer
-    winner.money += self.pot
-    winner.save
-    self.pot = 0
+
     self.dealer = (self.dealer + 1)%10 + 10
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
-    self.round = 0
+    set_round(0)
+    self.save
   end
 
   def set_round(round)
     self.round = round
-    if round == 4
-      deal(4)
-    end
     self.save
   end
 
