@@ -11,7 +11,10 @@ hi.
 Players: <br/>
 <% @game.players.each do |player| %>
   <%= player.username %>  <%= player.location %>
-  <% if player.in_hand %> in hand <%else%> folded <%end%>
+  <% if player.in_hand %> in hand <%else%> not in hand <%end%>
+    <% if @game.round==4 %>
+      <%= player.hand%>
+    <%end%>
     <% get_players_cards(player, @game).each do |card| %>
       <%= card.rank %><%= card.suit %>
     <%end%>
@@ -24,20 +27,13 @@ high bet: <%= @game.high_bet %>
 
 <br/> <br/>
 
-Table: <br/>
+Table:
 <% get_table_cards(@game).each do |card| %>
   <%= card.suit %><%= card.rank %>
 <%end%>
 <br/>
 
 Game round: <%= @game.round %> <br/>
-
-Deck: <br/>
-<% @game.cards.each do |card| %>
-  <% if card.location == -1 %>
-    <%=card.rank%><%=card.suit %>
-  <% end %>
-<%end%>
 
 <br/>
 Pot: <%= @game.pot %>
@@ -48,8 +44,12 @@ Current player <%= @game.current_player%>
 <br/>
 High better <%= @game.high_better%>
 
+<% if @game.round == 4 %>
+
+<% end %>
+
 <% if @game.round == 0 %>
-  <% if in_game(current_user, @game) %>
+  <% if in_game(current_user, @game) && @game.round==0 %>
     <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
   <% end %>
 <% end %>
@@ -60,10 +60,12 @@ High better <%= @game.high_better%>
   <% end %>
 <%end%>
 
+
+
 <br/>
 
 <% if in_game(current_user, @game) %>
-  <% if get_player(current_user, @game).location == @game.current_player %>
+  <% if get_player(current_user, @game).location == @game.current_player && @game.round < 4 %>
     <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
     <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %>
     <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %>
@@ -83,6 +85,8 @@ High better <%= @game.high_better%>
     <% end %>
   <% end %>
 <%end%> <br/>
+
+<%= button_to 'reset game', 'reset_game', params:{game: @game.id} %>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
