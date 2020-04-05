@@ -69,22 +69,77 @@ class Handjudge
     end
 
     def royal_flush?
+      if flush?
+        flush_ranks = flush?[1..5]
+        for i in 0..4
+            if flush_ranks[i] != 12 - i
+                return false
+            end
+        end
+      return [10, -1, -1, -1, -1, -1]
+      end
       return false
     end
 
     def straight_flush?
+      if !flush? || !straight?
+        return false
+      end
+      strToSuit = {'S'=>0, 'H'=>1, 'C'=>2, 'D'=>3}
+      strToRank = {'2'=>0, '3'=>1, '4'=>2, '5'=>3, '6'=>4, '7'=>5, '8'=>6, '9'=>7, '10'=>8, 'J'=>9, 'Q'=>10, 'K'=>11, 'A'=>12}
+      @suits.each do |suit|
+        if suit >= 5
+            flush_suit = suit
+        end
+      end
+      flush_arr = Array.new(13, 0)
+      for i in 0...7
+        card = @cards[i]
+        if strToSuit[card.suit] == flush_suit
+            flush_arr[strToRank[card.rank]] += 1
+        end
+      end
+      straight_count = 0
+      (12).downto(0) do |i|
+        if flush_arr[i] > 0
+            straight_count += 1
+            if straight_count == 5
+                return [9, i+4, -1, -1, -1, -1]
+            end
+        else
+            straight_count = 0
+        end
+      end
+      if flush_arr[12] == 1
+        for i in 0..3
+            if flush_arr[i] != 1
+                return false
+            end
+        end
+        return [9, 3, -1, -1, -1, -1]
+      end
       return false
     end
 
+    # checks for four of a kind in a hand, returns that along with 5th card being highest
     def four_of_a_kind?
-        for i in 0...13
-            if @ranks[i] == 4
-                return [8, i, -1, -1, -1, -1] # todo: get other card
+        high_single_card = -1
+        four_card = -1
+        (12).downto(0) do |i|
+            if @ranks[i] > 0 && @ranks[i] != 4 && high_single_card == -1
+                high_single_card = i
             end
+            if @ranks[i] == 4
+                four_card = i
+            end
+        end
+        if four_card != -1
+            return [8, four_card, high_single_card, -1, -1, -1]
         end
         return false
     end
 
+    # checks hands for full house, returns as [full house, triple card, pair, ..]
     def full_house?
         if three_of_a_kind?
             triple_high = three_of_a_kind?[1]
@@ -106,7 +161,6 @@ class Handjudge
            if suit >= 5
              score = [6]
              sorted_cards = @cards.sort_by{ |card| -strToRank[card.rank]}
-             p sorted_cards
              sorted_cards.each do |card|
                score.append(strToRank(card.rank))
              end
@@ -152,10 +206,24 @@ class Handjudge
     end
 
     def three_of_a_kind?
+        triple_high = -1
+        high_card = -1
+        sec_card = -1
         (12).downto(0) do |i|
-            if @ranks[i] == 3
-                return [4, i, -1, -1, -1, -1] # todo: get other cards
+            # checks for 3 of a kind
+            if @ranks[i] == 3 && triple_high == -1
+                triple_high = i
+            # gets other highest cards in hand
+            elsif @ranks[i] == 1 # shouldn't have any other pairs/triples if considering 3 of a kind
+                if high_card == -1
+                    high_card = i
+                elsif sec_card == -1
+                    sec_card = i
+                end
             end
+        end
+        if triple_high != -1
+            return [4, triple_high, high_card, sec_card, -1, -1] 
         end
         return false
     end
@@ -163,6 +231,7 @@ class Handjudge
     def two_pair?
         high_two_pair = -1
         low_two_pair = -1
+        high_single_card = -1
         pairCount = 0
         (12).downto(0) do |i|
             if @ranks[i] == 2
@@ -170,30 +239,49 @@ class Handjudge
                     high_two_pair = i
                 elsif pairCount == 1
                     low_two_pair = i
-                    return [3, high_two_pair, low_two_pair, -1, -1, -1] # todo: get other card
                 end
                 pairCount += 1
+            # sets high card, checking case that it is part of a pair
+            elsif (@ranks[i] == 1 || (@ranks[i] == 2 && pairCount == 2)) && high_single_card == -1
+                high_single_card = i
             end
+        end
+        if pairCount == 2
+            return [3, high_two_pair, low_two_pair, high_single_card, -1, -1] 
         end
         return false
     end
 
+    # returns [pair, pair rank, highest 3 cards, -1] if just a single pair in hand
     def pair?
+        single_cards = Array.new(4, -1)
+        single_count = 0
+        pair_rank = -1
         (12).downto(0) do |i|
             if @ranks[i] == 2
-                return [2, i, -1, -1, -1, -1]
+                pair_rank = i
+            elsif @ranks[i] == 1 && single_count < 3
+                single_cards[single_count] = i
+                single_count += 1
             end
+        end
+        if pair_rank != -1
+            return [2, pair_rank] + single_cards
         end
         return false
     end
 
+    # if hand has no better possible combinations, this returns 5 best cards by rank
     def highest_card?
+        single_cards = Array.new(5, -1)
+        single_count = 0
         (12).downto(0) do |i|
-            if @ranks[i] == 1
-                return [1, i, -1, -1, -1, -1]
+            if @ranks[i] == 1 and single_count < 5
+                single_cards[single_count] = i
+                single_count += 1
             end
         end
-        return false
+        return [1] + single_cards
     end
 
     def empty_hand?
