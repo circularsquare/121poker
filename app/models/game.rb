@@ -12,6 +12,8 @@ class Game < ApplicationRecord
     suits = ['S', 'H', 'C', 'D']
     self.pot = 0
     self.dealer = 10
+    self.big_blind = 2
+    self.small_blind = 1
     ranks.collect do |rank|
       suits.collect do |suit|
         self.cards << Card.new({:game_id => self.id, :rank => rank, :suit => suit, :location => -1})
@@ -33,14 +35,17 @@ class Game < ApplicationRecord
         player.in_hand = true
         player.save
       end
-      self.current_player = get_next_player(self.dealer)
+      addBlinds()
     when 1
+      self.current_player = get_next_player(self.dealer)
       move_card(get_random_card, 0)  #moves cards to table
       move_card(get_random_card, 0)
       move_card(get_random_card, 0)
     when 2
+      self.current_player = get_next_player(self.dealer)
       move_card(get_random_card, 0)
     when 3
+      self.current_player = get_next_player(self.dealer)
       move_card(get_random_card, 0)
     when 4
       end_game()
@@ -50,13 +55,35 @@ class Game < ApplicationRecord
     end
     self.players.each do |player|
       player.in_pot_current = 0
+      player.save
     end
-    self.high_bet = 0
-    self.high_better = self.current_player
+    if round_int > 0 && round_int < 4
+      self.high_bet = 0
+      self.high_better = self.current_player
+    end
     self.save
     if get_player(self.current_player).ai != ''
       action_loop()
     end
+    self.save
+  end
+
+  # helper function that puts blinds in pot upon dealing cards in first round of game
+  # sets first player to person after big blind
+  def addBlinds()
+    s_blind_loc = get_next_player(self.dealer) # location of small blind player
+    b_blind_loc = get_next_player(s_blind_loc) # location of big blind player
+    self.current_player = get_next_player(b_blind_loc)
+    s_blind_player = get_player(s_blind_loc)  # actual players to change money
+    b_blind_player = get_player(b_blind_loc)
+    # put money from small and big blind players into pot
+    s_blind_player.money -= self.small_blind
+    b_blind_player.money -= self.big_blind
+    self.high_bet = big_blind
+    self.high_better = b_blind_loc
+    self.pot += big_blind + small_blind
+    b_blind_player.save
+    s_blind_player.save
     self.save
   end
 
@@ -272,6 +299,8 @@ class Game < ApplicationRecord
   def get_player(location)
     return self.players.where(:location => location)[0]
   end
+
+  # returns next player that is in the game
   def get_next_player(start)
     for i in 1..10
       to_check = (start + i)%10 + 10
