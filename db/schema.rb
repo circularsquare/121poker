@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_04_183840) do
+ActiveRecord::Schema.define(version: 2020_04_05_180856) do
 
   create_table "cards", force: :cascade do |t|
     t.integer "game_id"
@@ -33,6 +33,8 @@ ActiveRecord::Schema.define(version: 2020_04_04_183840) do
     t.integer "current_player"
     t.integer "high_better"
     t.integer "dealer"
+    t.integer "big_blind"
+    t.integer "small_blind"
   end
 
   create_table "players", force: :cascade do |t|
