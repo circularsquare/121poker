@@ -27,43 +27,27 @@ class Handjudge
         # first entry corresponds to general case (royal_flush being 10 to high_card being 1)
         # other entries are tiebreakers
 
-        p 'hand cas'
         if royal_flush?
-          p '1'
           return score_to_number(royal_flush?)
         elsif straight_flush?
-          p '2'
           return score_to_number(straight_flush?)
         elsif four_of_a_kind?
-          p '2'
           return score_to_number(four_of_a_kind?)
         elsif full_house?
-          p '2'
           return score_to_number(full_house?)
         elsif flush?
-          p '2'
           return score_to_number(flush?)
         elsif straight?
-          p '2'
-          p straight?
           return score_to_number(straight?)
         elsif three_of_a_kind?
-          p '2'
           return score_to_number(three_of_a_kind?)
         elsif two_pair?
-          p '3'
-          p two_pair?
           return score_to_number(two_pair?)
         elsif pair?
-          p '4'
-          p pair?
           return score_to_number(pair?)
         elsif highest_card?
-          p highest_card?
-          p '5'
           return score_to_number(highest_card?)
         else
-          p '6'
           return score_to_number([-1, -1, -1, -1, -1, -1])
         end
     end
@@ -223,7 +207,7 @@ class Handjudge
             end
         end
         if triple_high != -1
-            return [4, triple_high, high_card, sec_card, -1, -1] 
+            return [4, triple_high, high_card, sec_card, -1, -1]
         end
         return false
     end
@@ -247,7 +231,7 @@ class Handjudge
             end
         end
         if pairCount == 2
-            return [3, high_two_pair, low_two_pair, high_single_card, -1, -1] 
+            return [3, high_two_pair, low_two_pair, high_single_card, -1, -1]
         end
         return false
     end

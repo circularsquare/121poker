@@ -2,6 +2,7 @@ class Game < ApplicationRecord
   has_many :players, dependent: :destroy
   has_many :cards, dependent: :destroy
 
+  #gets a random card from the deck
   def get_random_card
     return self.cards.where(:location => -1)[rand(self.cards.where(:location => -1).length)]
   end
@@ -14,6 +15,8 @@ class Game < ApplicationRecord
     self.dealer = 10
     self.big_blind = 2
     self.small_blind = 1
+    self.high_bet = -1
+    self.high_better = -1
     ranks.collect do |rank|
       suits.collect do |suit|
         self.cards << Card.new({:game_id => self.id, :rank => rank, :suit => suit, :location => -1})
@@ -22,14 +25,13 @@ class Game < ApplicationRecord
     end
   end
 
+  # called at the start of each round to deal and reset round specific values
   def deal(round)
     round_int = round.to_i
     case round_int
     when -1
-      p 'you tried to deal to a game that hasnt started'
     when 0
       self.players.each do |player|
-        p 'one player!!!'
         move_card(get_random_card, player.location)
         move_card(get_random_card, player.location)
         player.in_hand = true
@@ -50,8 +52,7 @@ class Game < ApplicationRecord
     when 4
       end_game()
     else
-      p '###deal case > 3, error###'
-      p round
+      p 'deal case > 4, error'
     end
     self.players.each do |player|
       player.in_pot_current = 0
@@ -61,7 +62,6 @@ class Game < ApplicationRecord
       self.high_bet = 0
       self.high_better = self.current_player
     end
-    self.save
     if get_player(self.current_player).ai != ''
       action_loop()
     end
@@ -77,40 +77,38 @@ class Game < ApplicationRecord
     s_blind_player = get_player(s_blind_loc)  # actual players to change money
     b_blind_player = get_player(b_blind_loc)
     # put money from small and big blind players into pot
-    s_blind_player.money -= self.small_blind
-    b_blind_player.money -= self.big_blind
-    self.high_bet = big_blind
-    self.high_better = b_blind_loc
-    self.pot += big_blind + small_blind
+    put_money(self.small_blind, s_blind_player)
+    put_money(self.big_blind, b_blind_player)
     b_blind_player.save
     s_blind_player.save
     self.save
   end
 
-  # Automates taking actions for each AI, advances round and deals under correct conditions
-  def action_loop()
-    go_once_around = true
-    player = get_player(self.current_player)
-
-    while ((not self.high_better == self.current_player) or go_once_around) and get_player(self.current_player).ai != ""
-      go_once_around = false
-      action_info = ai_action(player)
-      action(action_info[0], action_info[1], player.id)
-      player = get_player(self.current_player)
+  #puts money in pot and updates associated values
+  def put_money(amount, player)
+    if amount > player.money
+      amount = player.money
     end
-
-    if self.high_better == self.current_player
-      set_round(self.round + 1 % 5)
-      deal(self.round)
+    p 'testingggg'
+    p amount
+    p player.in_pot_current
+    p self.high_bet
+    p player.location
+    p 'testingggggg'
+    if amount + player.in_pot_current > self.high_bet
+      self.high_bet = amount + player.in_pot_current
+      self.high_better = player.location
     end
-
-    if self.players.where(:in_hand => true).length == 1
-      end_game()
-    end
+    player.money -= amount
+    player.in_pot_current += amount
+    player.in_pot_hand += amount
+    self.pot += amount
+    player.save
     self.save
   end
-
   # handles player actions
+  # progresses current_player
+  # progresses round if a round has completed
   def action(type, amount, player)
     @player = Player.find(player.to_i)
     amount = amount.to_i
@@ -118,18 +116,13 @@ class Game < ApplicationRecord
     when 'fold'
       @player.in_hand = false
     when 'bet'
-      p 'in_pot_current', @player.in_pot_current
-      p 'high_bet', self.high_bet
       if amount > @player.money
         amount = @player.money
       end
       if amount + @player.in_pot_current < self.high_bet
         p 'invalid bet'
       else
-        @player.money -= amount
-        self.pot += amount
-        self.high_bet = amount + @player.in_pot_current
-        self.high_better = @player.location
+        put_money(amount, @player)
       end
     when 'raise'
       if amount > @player.money
@@ -138,43 +131,62 @@ class Game < ApplicationRecord
       if amount + @player.in_pot_current < 2*self.high_bet
         p 'invalid raise'
       else
-        @player.money -= amount
-        self.pot += amount
-        self.high_bet = amount + @player.in_pot_current
-        self.high_better = @player.location
+        put_money(amount, @player)
       end
     when 'check'
     when 'call'
-      if high_bet > @player.money + @player.in_pot_current
-        amount = @player.money
-      else
-        amount = high_bet - @player.in_pot_current
-      end
-      self.pot += amount
-      @player.money -= amount
+      amount = self.high_bet - @player.in_pot_current
+      put_money(amount, @player)
     else
       p 'invalid action'
     end
-    @player.in_pot_current += amount
-    @player.in_pot_hand += amount
     self.current_player = get_next_player(self.current_player)
-    self.save
-    @player.save
 
+    if self.high_better == self.current_player #progress round if you've gone back around to the high better
+      # unless no one raises and it's back to big blind, bb should be able to go
+      if self.high_bet <= self.big_blind && self.round == 0 && self.high_better == get_next_player(get_next_player(self.dealer))
+        self.high_better = get_next_player(get_next_player(get_next_player(self.dealer)))
+      else
+        set_round(self.round + 1 % 5)
+        deal(self.round)
+      end
+    end
     if self.players.where(:in_hand => true).length == 1
-      p 'bruhhhhhhhhhhhhhhhhhhhhhhhhh'
-      p self.players.where(:in_hand => true)[0].username
       end_game()
     end
 
+    @player.save
+    self.save
   end
 
+  def can_call?(player)
+    return (self.high_bet > player.in_pot_current)
+  end
+  def can_check?(player)
+    return (self.high_bet == player.in_pot_current)
+  end
+  def can_bet?(player)
+    return (self.high_bet == 0) #todo: enforce min bet
+  end
+  def can_raise?(players) #todo: enforce min raise
+    return (self.high_bet != 0)
+  end
+
+
+  # Automates taking actions for each AI, advances round and deals under correct conditions
+  def action_loop()
+    while get_player(self.current_player).ai != ""
+      player = get_player(self.current_player)
+      action_info = ai_action(player)
+      action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
+    end
+    self.save
+  end
   # helper function to run when a user needs to take a turn
   def player_action(type, amount, player)
     action(type, amount, player)
     action_loop()
   end
-
   # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
     type = player.ai
@@ -203,11 +215,9 @@ class Game < ApplicationRecord
       if cards.length() == 7
         handjudge = Handjudge.new(cards)
         player.score = handjudge.judge()
-        p 'scoreeeeeeeeeeeeeeee'
+        p 'score:'
         p player.score
-        p 'scorrererer'
         player.hand = scoreToString[(player.score.to_f/(100**5)).round()]
-        p player.hand
         player.save
         if player.score > high_score
           high_score = player.score
@@ -240,7 +250,6 @@ class Game < ApplicationRecord
         winner.save
       end
       self.pot = 0
-      print(winners)
     end
 
     # reset deck of cards
@@ -260,12 +269,15 @@ class Game < ApplicationRecord
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
+    self.save
     set_round(0)
     deal(0)
     self.save
   end
 
   def set_round(round)
+    p 'advanced game round to '
+    p round
     self.round = round
     self.save
   end
