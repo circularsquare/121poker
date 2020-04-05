@@ -5,35 +5,42 @@
   <%= @game.room_name %>
 </p>
 
-hi.
-<br/> <br/>
-
-Players: <br/>
-<% @game.players.each do |player| %>
-  <%= player.username %>  <%= player.location %>
-  <% if player.in_hand %> in hand <%else%> not in hand <%end%>
-    <% if @game.round==4 %>
-      <%= player.hand%>
+<h2><b>Players</b></h2>
+<div class="container">
+  <div class="table">
+    <div class="table-header">
+      <div class="header__item"> username </div>
+      <div class="header__item"> location </div>
+      <div class="header__item"> in hand? </div>
+      <div class="header__item"> cards </div>
+      <div class="header__item"> money </div>
+      <div class="header__item"> $ in round </div>
+    </div>
+    <% @game.players.each do |player| %>
+      <div class="table-row">
+        <div class='table-data'> <% if @game.current_player == player.location %>
+                                    <font color='bb1111'> <%= player.username %> </font>
+                                 <% else %>
+                                    <%= player.username %> <%end%></div>
+        <div class='table-data'> <%= player.location %></div>
+        <div class='table-data'> <% if player.in_hand %> yes <%else%> no <%end%></div>
+        <div class='table-data'> <% get_players_cards(player, @game).each do |card| %>
+                                      <%= card.rank %><%= card.suit %> <%end%></div>
+        <div class='table-data'> <%= player.money %></div>
+        <div class='table-data'> <%= player.in_pot_current %> </div>
+      </div>
     <%end%>
-    <% get_players_cards(player, @game).each do |card| %>
-      <%= card.rank %><%= card.suit %>
-    <%end%>
-  <br/>
-  money: <%= player.money %>, in the round: <%= player.in_pot_current %>
-  <br/>
-<%end%> <br/>
+  </div>
+</div>
 
-<br/> <br/>
+<br/>
 
+<h2><b> Game info </b></h2>
+Game round: <%= @game.round %> <br/>
 Table:
 <% get_table_cards(@game).each do |card| %>
-  <%= card.suit %><%= card.rank %>
-<%end%>
-<br/>
-
-Game round: <%= @game.round %> <br/>
-
-<br/>
+  <%= card.rank %><%= card.suit %>
+<%end%><br/>
 Pot: <%= @game.pot %>
 <br/>
 Dealer <%= @game.dealer%>
@@ -52,10 +59,9 @@ Dealer <%= @game.dealer%>
     <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
   <% end %>
 <% end %>
-
 <% if in_game(current_user, @game) %>
   <% if @game.round == -1 or @game.round == 4 %>
-    <%= button_to 'start round', 'reset_game', params:{game: @game.id} %>
+    <%= button_to 'start next round', 'reset_game', params:{game: @game.id} %>
   <% end %>
 <%end%>
 
@@ -89,7 +95,9 @@ Dealer <%= @game.dealer%>
   <% end %>
 <%end%> <br/>
 
-<%= button_to 'reset game', 'reset_game', params:{game: @game.id} %>
+<% if false %>
+  <%= button_to 'reset game', 'reset_game', params:{game: @game.id} %>
+<% end %>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <% if !in_game(current_user, @game) %>

@@ -89,12 +89,6 @@ class Game < ApplicationRecord
     if amount > player.money
       amount = player.money
     end
-    p 'testingggg'
-    p amount
-    p player.in_pot_current
-    p self.high_bet
-    p player.location
-    p 'testingggggg'
     if amount + player.in_pot_current > self.high_bet
       self.high_bet = amount + player.in_pot_current
       self.high_better = player.location
