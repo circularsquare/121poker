@@ -15,6 +15,10 @@
       <div class="header__item"> cards </div>
       <div class="header__item"> money </div>
       <div class="header__item"> $ in round </div>
+      <% if @game.round == 4 %>
+        <div class="header__item"> best hand </div>
+      <% end %>
+      
     </div>
     <% @game.players.each do |player| %>
       <div class="table-row">
@@ -28,6 +32,9 @@
                                       <%= card.rank %><%= card.suit %> <%end%></div>
         <div class='table-data'> <%= player.money %></div>
         <div class='table-data'> <%= player.in_pot_current %> </div>
+        <% if @game.round == 4 %>
+          <div class= 'table-data'> <%= player.hand %> </div>
+        <% end %>
       </div>
     <%end%>
   </div>
@@ -39,8 +46,10 @@
 Game round: <%= @game.round %> <br/>
 Table:
 <% get_table_cards(@game).each do |card| %>
-  <%= card.rank %><%= card.suit %>
-<%end%><br/>
+  <% card_str = card.rank + card.suit %>
+  <img src="/assets/cards/<%= card_str %>.png" height="10%" width="10%">
+<%end%>
+<br/>
 Pot: <%= @game.pot %>
 <br/>
 Dealer <%= @game.dealer%>
