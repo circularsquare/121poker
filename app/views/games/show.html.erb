@@ -5,6 +5,56 @@
   <%= @game.room_name %>
 </p>
 
+<% if @game.round > 0 %>
+  <center><h2>Table Cards</h2></center>
+<% end %>
+<div class="card-container">
+  <div class="row">
+    <% get_table_cards(@game).each do |card| %>
+      <% card_str = card.rank + card.suit %>
+      <img src="/assets/cards/<%= card_str %>.png" height="10%" width="10%">
+    <%end%>
+  </div>
+  <div class="row">
+  <h2>AI Hands</h2>
+  </div>
+  <div class="row">
+    <div class = "overlap">
+      <div class = "overlap-container">
+        <img src="/assets/cards/9C.png">
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/9C.png" >
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/9C.png">
+      </div>
+    </div>
+    <div class = "overlap">
+      <div class = "overlap-container">
+        <img src="/assets/cards/10D.png">
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/10D.png">
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/10D.png">
+      </div>
+    </div>
+    <div class = "overlap">
+      <div class = "overlap-container">
+        <img src="/assets/cards/AS.png">
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/AS.png">
+      </div>
+      <div class = "overlap-container">
+        <img src="/assets/cards/AS.png">
+      </div>
+    </div>
+  </div>
+</div>
+
 <h2><b>Players</b></h2>
 <div class="container">
   <div class="table">

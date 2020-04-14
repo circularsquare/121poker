@@ -82,7 +82,6 @@ class GamesController < ApplicationController
   end
   def action
     Game.find_by(id: params[:game]).player_action(params[:type], params[:amount], params[:player])
-    p params
     redirect_back(fallback_location: root_path)
   end
   def deal

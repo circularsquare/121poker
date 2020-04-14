@@ -169,7 +169,7 @@ class Game < ApplicationRecord
 
   # Automates taking actions for each AI, advances round and deals under correct conditions
   def action_loop()
-    while get_player(self.current_player).ai != ""
+    while get_player(self.current_player).ai != "" && self.high_better != self.current_player
       player = get_player(self.current_player)
       action_info = ai_action(player)
       action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
@@ -181,8 +181,10 @@ class Game < ApplicationRecord
     action(type, amount, player)
     action_loop()
   end
+
   # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
+    sleep(2)
     type = player.ai
     if self.high_bet == 0
       return 'check', 0
