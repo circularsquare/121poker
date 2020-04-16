@@ -146,11 +146,7 @@ class Handjudge
              score = [6]
              sorted_cards = @cards.sort_by{ |card| -strToRank[card.rank]}
              sorted_cards.each do |card|
-<<<<<<< HEAD
                score.append(strToRank[card.rank])
-=======
-               score.append(strToRank(card.rank))
->>>>>>> fcb138897f3aa737e737b69637778e4777542a5f
              end
              return score
            end

@@ -12,47 +12,40 @@
   <div class="row">
     <% get_table_cards(@game).each do |card| %>
       <% card_str = card.rank + card.suit %>
-      <img src="/assets/cards/<%= card_str %>.png" height="10%" width="10%">
+      <img src="/assets/cards/<%= card_str %>.png">
     <%end%>
   </div>
-  <div class="row">
-  <h2>AI Hands</h2>
-  </div>
-  <div class="row">
-    <div class = "overlap">
-      <div class = "overlap-container">
-        <img src="/assets/cards/9C.png">
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/9C.png" >
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/9C.png">
-      </div>
+  <% if @game.round > -1 %>
+    <div class="row">
+      Current Bet:
+      <% @game.players.each do |player| %>
+        <%= player.in_pot_current %>
+      <%end%>
     </div>
-    <div class = "overlap">
-      <div class = "overlap-container">
-        <img src="/assets/cards/10D.png">
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/10D.png">
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/10D.png">
-      </div>
+    <div class="row">
+      Money in Hand:
+      <% @game.players.each do |player| %>
+        <%= player.in_pot_hand %>
+      <%end%>
     </div>
-    <div class = "overlap">
-      <div class = "overlap-container">
-        <img src="/assets/cards/AS.png">
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/AS.png">
-      </div>
-      <div class = "overlap-container">
-        <img src="/assets/cards/AS.png">
-      </div>
+    <div class = "row">
+      <% @game.players.each do |player| %>
+        <% if player.ai != "" %>
+          <div class = "overlap">
+            <div class = "overlap-container"><img src="/assets/cards/green_back.png"></div>
+            <div class = "overlap-container"><img src="/assets/cards/green_back.png"></div>
+          </div>
+        <% else %>
+          <div class = "overlap">
+            <% get_players_cards(player, @game).each do |card| %>
+              <% card_str = card.rank + card.suit %>
+              <div class = "overlap-container"><img src="/assets/cards/<%= card_str %>.png"></div>
+            <%end%>
+          </div>
+        <%end%>
+      <%end%>
     </div>
-  </div>
+  <%end%>
 </div>
 
 <h2><b>Players</b></h2>
@@ -68,7 +61,7 @@
       <% if @game.round == 4 %>
         <div class="header__item"> best hand </div>
       <% end %>
-      
+
     </div>
     <% @game.players.each do |player| %>
       <div class="table-row">
@@ -94,15 +87,10 @@
 
 <h2><b> Game info </b></h2>
 Game round: <%= @game.round %> <br/>
-Table:
-<% get_table_cards(@game).each do |card| %>
-  <% card_str = card.rank + card.suit %>
-  <img src="/assets/cards/<%= card_str %>.png" height="10%" width="10%">
-<%end%>
 <br/>
 Pot: <%= @game.pot %>
 <br/>
-Dealer <%= @game.dealer%>
+Dealer Loc: <%= @game.dealer%>
 <br/>
 <% if @game.round != -1 %>
   Current player: <%= @game.current_player%>
@@ -112,12 +100,6 @@ Dealer <%= @game.dealer%>
   High bet: <%= @game.high_bet%>
 <% end %>
 
-
-<% if @game.round == 0 %>
-  <% if in_game(current_user, @game) && @game.round==0 %>
-    <%= button_to 'deal', 'deal', params: {game: @game.id, round: @game.round} %>
-  <% end %>
-<% end %>
 <% if in_game(current_user, @game) %>
   <% if @game.round == -1 or @game.round == 4 %>
     <%= button_to 'start next round', 'reset_game', params:{game: @game.id} %>

@@ -255,15 +255,18 @@ path{
 .card-container .row {
   margin: 20px;
   text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .card-container .row img {
-  margin: 0;
+  height: 150px;
 }
 
 .card-container .row .overlap {
   display: flex;
-  width: 100px;
+  width: 120px;
+  margin: 20px;
 }
 .card-container .row .overlap .overlap-container {
   flex: 1 0 0;
@@ -272,9 +275,7 @@ path{
 .card-container .row .overlap .overlap-container:last-child {
   flex: 0 0 auto;
 }
-.card-container .row .overlap .overlap-container img {
-  height: 100px
-}
+
 // Relevant styles
 .card-container .image-stack {
   display: grid;
@@ -392,6 +393,3 @@ path{
   	}
 
   }
-
-
-
