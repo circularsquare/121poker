@@ -55,17 +55,16 @@ class Game < ApplicationRecord
       p 'deal case > 4, error'
     end
 
+    self.players.each do |player|
+      player.in_pot_current = 0
+      player.save
+    end
     if round_int > 0 && round_int < 4
       self.high_bet = 0
       self.high_better = self.current_player
     end
     if get_player(self.current_player).ai != ''
       action_loop()
-    end
-    # TODO: figure out where this goes
-    self.players.each do |player|
-      player.in_pot_current = 0
-      player.save
     end
     self.save
   end
@@ -131,6 +130,7 @@ class Game < ApplicationRecord
         put_money(amount, @player)
       end
     when 'check'
+      self.high_better = self.get_next_player(self.dealer)
     when 'call'
       amount = self.high_bet - @player.in_pot_current
       put_money(amount, @player)
@@ -194,9 +194,9 @@ class Game < ApplicationRecord
   def ai_action(player)
     type = player.ai
     if self.high_bet == 0
-      return 'bet', 10
+      return 'check', 0
     elsif self.high_bet <= 10
-      return 'call', self.high_bet
+      return 'bet', 10
     else
       return 'fold', 0
     end
