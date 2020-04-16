@@ -16,7 +16,7 @@
         <div class='table-data'> <%= game.players.length %></div>
         <div class='table-data'> <%= link_to 'Show', game%></div>
         <div class='table-data'> <%= link_to 'Edit', edit_game_path(game) %></div>
-        <div class='table-data'> <%= link_to 'Destroy', game, method: :delete, data: {confirm: 'r u sure' }%></div>
+        <div class='table-data'> <%= link_to 'Destroy', game, method: :delete, data: {confirm: 'Are you sure you would like to delete this game?' }%></div>
       </div>
     <%end%>
   </div>

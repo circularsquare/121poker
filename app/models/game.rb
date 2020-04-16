@@ -32,7 +32,7 @@ class Game < ApplicationRecord
     when -1
     when 0
       self.players.each do |player|
-        move_card(get_random_card, player.location)
+        move_card(get_random_card, player.location)   # moves cards to users
         move_card(get_random_card, player.location)
         player.in_hand = true
         player.save
@@ -54,16 +54,18 @@ class Game < ApplicationRecord
     else
       p 'deal case > 4, error'
     end
-    self.players.each do |player|
-      player.in_pot_current = 0
-      player.save
-    end
+
     if round_int > 0 && round_int < 4
       self.high_bet = 0
       self.high_better = self.current_player
     end
     if get_player(self.current_player).ai != ''
       action_loop()
+    end
+    # TODO: figure out where this goes
+    self.players.each do |player|
+      player.in_pot_current = 0
+      player.save
     end
     self.save
   end
@@ -73,12 +75,13 @@ class Game < ApplicationRecord
   def addBlinds()
     s_blind_loc = get_next_player(self.dealer) # location of small blind player
     b_blind_loc = get_next_player(s_blind_loc) # location of big blind player
-    self.current_player = get_next_player(b_blind_loc)
+    # get player data for small and big blind locations
     s_blind_player = get_player(s_blind_loc)  # actual players to change money
     b_blind_player = get_player(b_blind_loc)
     # put money from small and big blind players into pot
     put_money(self.small_blind, s_blind_player)
     put_money(self.big_blind, b_blind_player)
+    self.current_player = get_next_player(b_blind_loc)
     b_blind_player.save
     s_blind_player.save
     self.save
@@ -134,7 +137,7 @@ class Game < ApplicationRecord
     else
       p 'invalid action'
     end
-    self.current_player = get_next_player(self.current_player)
+    self.current_player = self.get_next_player(@player.location) # Set next player to current
 
     if self.high_better == self.current_player #progress round if you've gone back around to the high better
       # unless no one raises and it's back to big blind, bb should be able to go
@@ -145,14 +148,15 @@ class Game < ApplicationRecord
         deal(self.round)
       end
     end
-    if self.players.where(:in_hand => true).length == 1
-      end_game()
+    if self.players.where(:in_hand => true).length <= 1
+      reset_game()
     end
 
     @player.save
     self.save
   end
 
+  # Set of helper functions that check if player actions are valid
   def can_call?(player)
     return (self.high_bet > player.in_pot_current)
   end
@@ -166,6 +170,10 @@ class Game < ApplicationRecord
     return (self.high_bet != 0)
   end
 
+  # Gets called from deal(4)
+  def end_game()
+    get_winners()
+  end
 
   # Automates taking actions for each AI, advances round and deals under correct conditions
   def action_loop()
@@ -184,11 +192,10 @@ class Game < ApplicationRecord
 
   # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
-    sleep(2)
     type = player.ai
     if self.high_bet == 0
-      return 'check', 0
-    elsif self.high_bet < player.money/2
+      return 'bet', 10
+    elsif self.high_bet <= 10
       return 'call', self.high_bet
     else
       return 'fold', 0
@@ -229,17 +236,20 @@ class Game < ApplicationRecord
     return winners
   end
 
-  def end_game()
-    get_winners()
-  end
 
-  # At the end of a round, this is called to reset card deck, correctly allocate the round's money,
+  # At the end of a game, this is called to reset card deck (by button), correctly allocate the round's money,
   # and increment the dealer
   def reset_game()
-
+    # If money in pot, distribute
     while (self.pot > 0)
-      #gets people with highest score
-      winners = get_winners()
+      winners = []
+      # In case where everyone has folded, set the winner to whoever is left
+      if self.players.where(:in_hand => true).length <= 1
+        winners = self.players.where(:in_hand => true)
+      else
+        #gets people with highest score
+        winners = get_winners()
+      end
       winners.each do |winner|
         #TO IMPLEMENT: more advanced side pots
         winner.money += self.pot / winners.length()
@@ -247,7 +257,6 @@ class Game < ApplicationRecord
       end
       self.pot = 0
     end
-
     # reset deck of cards
     self.cards.where.not(:location => -1).each do |card|
       card.location = -1
@@ -259,15 +268,16 @@ class Game < ApplicationRecord
       player.in_pot_current = 0
       player.save
     end
-    # reset pot to empty, increment dealer
-
-    self.dealer = (self.dealer + 1)%10 + 10
+    # reset pot to empty, increment dealer if not first hand
+    if self.round != -1
+      self.dealer = (self.dealer + 1)%10 + 10
+    end
+    # makes sure a player exists where the dealer is set
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
-    self.save
     set_round(0)
-    deal(0)
+    deal(self.round)
     self.save
   end
 
@@ -304,11 +314,13 @@ class Game < ApplicationRecord
       end
     end
   end
+
   def get_player(location)
     return self.players.where(:location => location)[0]
   end
 
   # returns next player that is in the game
+  # takes in a location and returns the next location of a player in the game
   def get_next_player(start)
     for i in 1..10
       to_check = (start + i)%10 + 10

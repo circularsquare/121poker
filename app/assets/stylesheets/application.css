@@ -226,47 +226,27 @@ path{
   height: 0px;
   z-index: 0;}
 
-/* https://stackoverflow.com/questions/12813573/position-icons-into-circle */
-.circle-container {
-  position: relative;
-  width: 24em;
-  height: 24em;
-  padding: 2.8em;
-    /*2.8em = 2em*1.4 (2em = half the width of a link with img, 1.4 = sqrt(2))*/
-  border: dashed 1px;
-  border-radius: 50%;
-  margin: 1.75em auto 0;
-}
-.circle-container a {
-  display: block;
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 4em; height: 4em;
-  margin: -2em;
-}
-.circle-container img { display: block; width: 100%; }
-.deg0 { transform: translate(12em); } /* 12em = half the width of the wrapper */
-.deg45 { transform: rotate(45deg) translate(12em) rotate(-45deg); }
-.deg135 { transform: rotate(135deg) translate(12em) rotate(-135deg); }
-.deg180 { transform: translate(-12em); }
-.deg225 { transform: rotate(225deg) translate(12em) rotate(-225deg); }
-.deg315 { transform: rotate(315deg) translate(12em) rotate(-315deg); }
-
 .card-container .row {
-  margin: 20px;
   text-align: center;
   display: flex;
+  flex-direction: row;
   justify-content: center;
 }
 
 .card-container .row img {
   height: 150px;
+  margin: 10px 0px;
+}
+
+.card-container .row .text-box {
+  width: 120px;
+  margin: 0px 10px;
 }
 
 .card-container .row .overlap {
   display: flex;
   width: 120px;
-  margin: 20px;
+  margin: 0px 10px;
 }
 .card-container .row .overlap .overlap-container {
   flex: 1 0 0;
@@ -275,31 +255,6 @@ path{
 .card-container .row .overlap .overlap-container:last-child {
   flex: 0 0 auto;
 }
-
-// Relevant styles
-.card-container .image-stack {
-  display: grid;
-  position: relative; // imperative for the overlapping to work
-  grid-template-columns: repeat(12, 1fr);
-}
-
-.card-container .image-stack__item--bottom {
-  grid-column: 4 / -1;
-  grid-row: 1;
-}
-
-.card-container .image-stack__item--top {
-  grid-row: 1;
-  grid-column: 1 / span 8;
-  padding-top: 20%; // slightly arbitrary, keeps proportion once resized
-  z-index: 1; // tells the browser to make this image on top
-}
-
-/* img {
-  width: 100%;
-  display: block;
-} */
-
 
 ::-webkit-scrollbar {
   width: 6px;

@@ -16,21 +16,18 @@
     <%end%>
   </div>
   <% if @game.round > -1 %>
-    <div class="row">
-      Current Bet:
+    <div class = "row">
       <% @game.players.each do |player| %>
-        <%= player.in_pot_current %>
-      <%end%>
-    </div>
-    <div class="row">
-      Money in Hand:
-      <% @game.players.each do |player| %>
-        <%= player.in_pot_hand %>
+        <% if @game.current_player == player.location %>
+          <font color='bb1111'><div class="text-box"><%= player.username %></div></font>
+        <% else %>
+          <div class="text-box"><%= player.username %></div>
+        <%end%>
       <%end%>
     </div>
     <div class = "row">
       <% @game.players.each do |player| %>
-        <% if player.ai != "" %>
+        <% if player.ai != "" && (@game.round < 4 or player.in_hand==false) %>
           <div class = "overlap">
             <div class = "overlap-container"><img src="/assets/cards/green_back.png"></div>
             <div class = "overlap-container"><img src="/assets/cards/green_back.png"></div>
@@ -43,6 +40,16 @@
             <%end%>
           </div>
         <%end%>
+      <%end%>
+    </div>
+    <div class="row">
+    <% @game.players.each do |player| %>
+      <div class="text-box">Bet: <%= player.in_pot_current %></div>
+    <%end%>
+    </div>
+    <div class="row">
+      <% @game.players.each do |player| %>
+        <div class="text-box">In pot: <%= player.in_pot_hand %></div>
       <%end%>
     </div>
   <%end%>
@@ -102,7 +109,7 @@ Dealer Loc: <%= @game.dealer%>
 
 <% if in_game(current_user, @game) %>
   <% if @game.round == -1 or @game.round == 4 %>
-    <%= button_to 'start next round', 'reset_game', params:{game: @game.id} %>
+    <%= button_to 'start next hand', 'reset_game', params:{game: @game.id} %>
   <% end %>
 <%end%>
 
@@ -135,10 +142,6 @@ Dealer Loc: <%= @game.dealer%>
       <% end %> <% end %>
   <% end %>
 <%end%> <br/>
-
-<% if false %>
-  <%= button_to 'reset game', 'reset_game', params:{game: @game.id} %>
-<% end %>
 
 <%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
 <% if !in_game(current_user, @game) %>
