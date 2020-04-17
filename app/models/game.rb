@@ -102,6 +102,7 @@ class Game < ApplicationRecord
     player.save
     self.save
   end
+
   # handles player actions
   # progresses current_player
   # progresses round if a round has completed
@@ -177,7 +178,7 @@ class Game < ApplicationRecord
 
   # Automates taking actions for each AI, advances round and deals under correct conditions
   def action_loop()
-    while get_player(self.current_player).ai != "" && self.high_better != self.current_player
+    while get_player(self.current_player).ai != "" #&& self.high_better != self.current_player
       player = get_player(self.current_player)
       action_info = ai_action(player)
       action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
@@ -194,11 +195,13 @@ class Game < ApplicationRecord
   def ai_action(player)
     type = player.ai
     if self.high_bet == 0
-      return 'check', 0
-    elsif self.high_bet <= 10
-      return 'bet', 10
-    else
+      return 'bet', 2
+    elsif self.high_bet < 4
+      return 'raise', 4
+    elsif self.high_bet >= 16
       return 'fold', 0
+    else
+      return 'call', 0
     end
   end
 
@@ -212,7 +215,7 @@ class Game < ApplicationRecord
     scoreToString = {1=>'high card', 2=>'pair', 3=>'two pair', 4=>'three of a kind', 5=>'straight', 6=>'flush', 7=>'full house', 8=>'four of a kind', 9=>'straight flush', 10=>'royal flush'}
     high_score = -100^7
     winners = []
-    players = self.players.where(:in_game == true)
+    players = self.players.where(:in_hand == true)
     players.each do |player|
       cards = self.cards.where(:location => player.location) + self.cards.where(:location => 0)
       if cards.length() == 7
