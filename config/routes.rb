@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   post 'games/deal', to: 'games#deal'
   post 'games/set_round', to: 'games#set_round'
   post 'games/leave_game', to: 'games#leave_game'
-  post 'games/reset_game', to: 'games#reset_game'
+  post 'games/start_game', to: 'games#start_game'
 
   #created by andrew while learning rails 2/13, see app/controllers/cards_controller.rb
   resources :games
