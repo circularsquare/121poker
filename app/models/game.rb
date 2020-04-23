@@ -185,6 +185,7 @@ class Game < ApplicationRecord
     end
     self.save
   end
+
   # helper function to run when a user needs to take a turn
   def player_action(type, amount, player)
     action(type, amount, player)
@@ -193,6 +194,7 @@ class Game < ApplicationRecord
 
   # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
+    sleep 2
     type = player.ai
     if self.high_bet == 0
       return 'bet', 2

@@ -68,6 +68,7 @@ class GamesController < ApplicationController
     end
   end
 
+
   def add_ai
     Game.find_by(id: params[:game]).add_ai_player(params[:type], User.find_by(id: params[:user].to_i))
     redirect_back(fallback_location: root_path)

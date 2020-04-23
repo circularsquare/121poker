@@ -15,6 +15,11 @@
       <img src="/assets/cards/<%= card_str %>.png">
     <%end%>
   </div>
+  <div class="row">
+    <div class="text box">
+      Pot: <%= @game.pot %>
+    </div>
+  </div>
   <% if @game.round > -1 %>
     <div class = "row">
       <% @game.players.each do |player| %>
