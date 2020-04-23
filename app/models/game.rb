@@ -8,7 +8,7 @@ class Game < ApplicationRecord
   end
 
   def init
-    self.round = -1
+    self.round = 4
     ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
     suits = ['S', 'H', 'C', 'D']
     self.pot = 0
@@ -30,6 +30,7 @@ class Game < ApplicationRecord
     round_int = round.to_i
     case round_int
     when -1
+      reset_game()
     when 0
       self.players.each do |player|
         move_card(get_random_card, player.location)   # moves cards to users
@@ -50,7 +51,7 @@ class Game < ApplicationRecord
       self.current_player = get_next_player(self.dealer)
       move_card(get_random_card, 0)
     when 4
-      end_game()
+      get_winners()
     else
       p 'deal case > 4, error'
     end
@@ -63,7 +64,7 @@ class Game < ApplicationRecord
       self.high_bet = 0
       self.high_better = self.current_player
     end
-    if get_player(self.current_player).ai != ''
+    if get_player(self.current_player).ai != '' && self.round < 4
       action_loop()
     end
     self.save
@@ -140,17 +141,19 @@ class Game < ApplicationRecord
     end
     self.current_player = self.get_next_player(@player.location) # Set next player to current
 
+    @player.save
+    self.save
     if self.high_better == self.current_player #progress round if you've gone back around to the high better
       # unless no one raises and it's back to big blind, bb should be able to go
       if self.high_bet <= self.big_blind && self.round == 0 && self.high_better == get_next_player(get_next_player(self.dealer))
         self.high_better = get_next_player(get_next_player(get_next_player(self.dealer)))
       else
-        set_round(self.round + 1 % 5)
+        set_round((self.round + 1))
         deal(self.round)
       end
     end
     if self.players.where(:in_hand => true).length <= 1
-      reset_game()
+      set_round(4)
     end
 
     @player.save
@@ -178,7 +181,7 @@ class Game < ApplicationRecord
 
   # Automates taking actions for each AI, advances round and deals under correct conditions
   def action_loop()
-    while get_player(self.current_player).ai != "" #&& self.high_better != self.current_player
+    while get_player(self.current_player).ai != "" && self.round < 4 #&& self.high_better != self.current_player
       player = get_player(self.current_player)
       action_info = ai_action(player)
       action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
@@ -194,7 +197,6 @@ class Game < ApplicationRecord
 
   # Defines a basic AI, giving them actions to take under different conditions
   def ai_action(player)
-    sleep 2
     type = player.ai
     if self.high_bet == 0
       return 'bet', 2
@@ -217,8 +219,8 @@ class Game < ApplicationRecord
     scoreToString = {1=>'high card', 2=>'pair', 3=>'two pair', 4=>'three of a kind', 5=>'straight', 6=>'flush', 7=>'full house', 8=>'four of a kind', 9=>'straight flush', 10=>'royal flush'}
     high_score = -100^7
     winners = []
-    players = self.players.where(:in_hand == true)
-    players.each do |player|
+    players_in_hand = self.players.where(:in_hand => true)
+    players_in_hand.each do |player|
       cards = self.cards.where(:location => player.location) + self.cards.where(:location => 0)
       if cards.length() == 7
         handjudge = Handjudge.new(cards)
@@ -235,7 +237,7 @@ class Game < ApplicationRecord
         end
       else
         p 'invalid number of cards passed'
-        return players
+        return players_in_hand
       end
     end
     return winners
@@ -271,6 +273,7 @@ class Game < ApplicationRecord
     self.players.each do |player|
       player.in_pot_hand = 0
       player.in_pot_current = 0
+      player.hand = ''
       player.save
     end
     # reset pot to empty, increment dealer if not first hand
