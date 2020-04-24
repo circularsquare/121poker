@@ -165,7 +165,7 @@ class Handjudge
                 if straight_count == 5
                     straight_high_card = j
                     for i in 1...3
-                        if @ranks[i + j] > 0
+                        if (i + j) < 13 && @ranks[i + j] > 0
                             straight_high_card = i+j
                         else
                             break
@@ -271,28 +271,4 @@ class Handjudge
     def empty_hand?
     end
 
-
-    "OPS = [
-        ['Royal Flush',     :royal_flush? ],
-        ['Straight Flush',  :straight_flush? ],
-        ['Four of a kind',  :four_of_a_kind? ],
-        ['Full house',      :full_house? ],
-        ['Flush',           :flush? ],
-        ['Straight',        :straight? ],
-        ['Three of a kind', :three_of_a_kind?],
-        ['Two pair',        :two_pair? ],
-        ['Pair',            :pair? ],
-        ['Highest Card',    :highest_card? ],
-        ['Empty Hand',      :empty_hand? ],
-
-      end"
-
-      # Returns the verbose hand rating
-      #
-      #     PokerHand.new("4s 5h 6c 7d 8s").hand_rating     # => "Straight"
-      def hand_rating
-        OPS.map { |op|
-          (method(op[1]).call()) ? op[0] : false
-        }.find { |v| v }
-      end
 end

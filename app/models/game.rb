@@ -184,6 +184,9 @@ class Game < ApplicationRecord
     while get_player(self.current_player).ai != "" && self.round < 4 #&& self.high_better != self.current_player
       player = get_player(self.current_player)
       action_info = ai_action(player)
+      if player.ai == "2"
+        action_info = prob_ai_action(player)
+      end
       action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
     end
     self.save
@@ -206,6 +209,30 @@ class Game < ApplicationRecord
       return 'fold', 0
     else
       return 'call', 0
+    end
+  end
+
+  def prob_ai_action(player)
+    type = player.ai
+    probjudge = Probjudge.new(self.cards.where(:location => player.location), self.cards.where(:location => 0))
+    prob = probjudge.judge()
+    maxBet = (self.round * 5 * prob) + 5
+    if self.round == 0
+      if self.high_bet < 5
+        return 'call', 0
+      else
+        return 'fold', 0
+      end
+    else
+      if self.high_bet == 0
+        return 'bet', maxBet / 2
+      elsif self.high_bet < maxBet / 2
+        return 'raise', (maxBet / 2) - self.high_bet
+      elsif self.high_bet < maxBet
+        return 'call', 0
+      else
+        return 'fold', 0
+      end
     end
   end
 
@@ -309,7 +336,7 @@ class Game < ApplicationRecord
   end
   # creates ai player under the current game and the user who made it
   def add_ai_player(type, user)
-    @player = Player.new({:ai => type, :game_id => self.id, :user_id => user.id, :money => 100, :username => 'ai 1', :location => self.get_empty_location(), :in_pot_hand => 0, :in_pot_current => 0})
+    @player = Player.new({:ai => type, :game_id => self.id, :user_id => user.id, :money => 100, :username => 'ai '+type.to_str, :location => self.get_empty_location(), :in_pot_hand => 0, :in_pot_current => 0})
     self.players << @player
     self.save
   end

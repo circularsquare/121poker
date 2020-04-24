@@ -146,7 +146,8 @@ Dealer Loc: <%= @game.dealer%>
   <% end %>
 <%end%> <br/>
 
-<%= button_to 'Add AI', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
+<%= button_to 'Add AI 1', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
+<%= button_to 'Add AI 2', 'add_ai', params:{game: @game.id, type: '2', user: current_user} %>
 <% if !in_game(current_user, @game) %>
   <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
 <% else %>
