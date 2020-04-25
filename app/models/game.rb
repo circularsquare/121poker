@@ -29,13 +29,11 @@ class Game < ApplicationRecord
   def deal(round)
     round_int = round.to_i
     case round_int
-    when -1
-      reset_game()
     when 0
       self.players.each do |player|
         move_card(get_random_card, player.location)   # moves cards to users
         move_card(get_random_card, player.location)
-        player.in_hand = true
+        # player.in_hand = true
         player.save
       end
       addBlinds()
@@ -53,7 +51,7 @@ class Game < ApplicationRecord
     when 4
       get_winners()
     else
-      p 'deal case > 4, error'
+      p 'deal case > 4 or < 0, error'
     end
 
     self.players.each do |player|
@@ -92,11 +90,11 @@ class Game < ApplicationRecord
     if amount > player.money
       amount = player.money
     end
-    if amount + player.in_pot_current > self.high_bet
+    if amount + player.in_pot_current > self.high_bet   # if player is new high bet (bets more than current highest)
       self.high_bet = amount + player.in_pot_current
       self.high_better = player.location
     end
-    player.money -= amount
+    player.money -= amount    # puts money in correct places and takes from player's pot
     player.in_pot_current += amount
     player.in_pot_hand += amount
     self.pot += amount
@@ -132,7 +130,7 @@ class Game < ApplicationRecord
         put_money(amount, @player)
       end
     when 'check'
-      self.high_better = self.get_next_player(self.dealer)
+      # do nothing; high better already set to be player after dealer inside of deal()
     when 'call'
       amount = self.high_bet - @player.in_pot_current
       put_money(amount, @player)
@@ -298,6 +296,7 @@ class Game < ApplicationRecord
     end
     # reset amount each player has in the pot to 0
     self.players.each do |player|
+      player.in_hand = true
       player.in_pot_hand = 0
       player.in_pot_current = 0
       player.hand = ''
@@ -311,7 +310,7 @@ class Game < ApplicationRecord
     while self.players.where(:location => self.dealer).length == 0
       self.dealer = (self.dealer + 1)%10 + 10
     end
-    set_round(0)
+    self.round = 0
     deal(self.round)
     self.save
   end

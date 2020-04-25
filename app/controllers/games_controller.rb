@@ -98,7 +98,7 @@ class GamesController < ApplicationController
     redirect_back(fallback_location: root_path)
   end
   def start_game
-    Game.find_by(id: params[:game]).deal(params[:des_round])
+    Game.find_by(id: params[:game]).reset_game()
     redirect_back(fallback_location: root_path)
   end
 

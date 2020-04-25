@@ -112,7 +112,7 @@ Dealer Loc: <%= @game.dealer%>
 
 <% if in_game(current_user, @game) %>
   <% if @game.round == 4 %>
-    <%= button_to 'start next hand', 'start_game', params:{game: @game.id, des_round: -1} %>
+    <%= button_to 'start next hand', 'start_game', params:{game: @game.id} %>
   <% end %>
 <%end%>
 
