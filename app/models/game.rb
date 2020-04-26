@@ -62,9 +62,6 @@ class Game < ApplicationRecord
       self.high_bet = 0
       self.high_better = self.current_player
     end
-    if get_player(self.current_player).ai != '' && self.round < 4
-      action_loop()
-    end
     self.save
   end
 
@@ -121,14 +118,14 @@ class Game < ApplicationRecord
         put_money(amount, @player)
       end
     when 'raise'
-      if amount > @player.money
+      if amount > @player.money || (amount + @player.in_pot_current < 2*self.high_bet && 2*self.high_bet - @player.in_pot_current > @player.money)
         amount = @player.money
-      end
-      if amount + @player.in_pot_current < 2*self.high_bet
-        p 'invalid raise'
+      elsif amount + @player.in_pot_current < 2*self.high_bet
+        amount = 2*self.high_bet - @player.in_pot_current
       else
-        put_money(amount, @player)
+        amount = amount + self.high_bet - @player.in_pot_current
       end
+      put_money(amount, @player)
     when 'check'
       # do nothing; high better already set to be player after dealer inside of deal()
     when 'call'
@@ -177,40 +174,45 @@ class Game < ApplicationRecord
     get_winners()
   end
 
-  # Automates taking actions for each AI, advances round and deals under correct conditions
-  def action_loop()
-    while get_player(self.current_player).ai != "" && self.round < 4 #&& self.high_better != self.current_player
-      player = get_player(self.current_player)
-      action_info = ai_action(player)
-      if player.ai == "2"
-        action_info = prob_ai_action(player)
-      end
-      action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
+  def ai_turn?()
+    return get_player(self.current_player).ai != ""
+  end
+
+  # takes actions for the AI that is up
+  def ai_action()
+    # sleep 3
+    player = get_player(self.current_player)
+    action_info = ai_one_logic(player)
+    if player.ai == "2"
+      action_info = ai_two_logic(player)
     end
+    action(action_info[0], action_info[1], player.id) # this progresses current player and may progress round
     self.save
   end
 
-  # helper function to run when a user needs to take a turn
-  def player_action(type, amount, player)
-    action(type, amount, player)
-    action_loop()
-  end
-
   # Defines a basic AI, giving them actions to take under different conditions
-  def ai_action(player)
+  def ai_one_logic(player)
     type = player.ai
-    if self.high_bet == 0
-      return 'bet', 2
-    elsif self.high_bet < 4
-      return 'raise', 4
-    elsif self.high_bet >= 16
-      return 'fold', 0
+    if self.round == 0
+      if self.high_bet < 5
+        return 'call', 0
+      else
+        return 'fold', 0
+      end
     else
-      return 'call', 0
+      if self.high_bet == 0
+        return 'bet', 2
+      elsif self.high_bet < 4
+        return 'raise', 4
+      elsif self.high_bet >= 16
+        return 'fold', 0
+      else
+        return 'call', 0
+      end
     end
   end
 
-  def prob_ai_action(player)
+  def ai_two_logic(player)
     type = player.ai
     probjudge = Probjudge.new(self.cards.where(:location => player.location), self.cards.where(:location => 0))
     prob = probjudge.judge()
@@ -311,8 +313,10 @@ class Game < ApplicationRecord
       self.dealer = (self.dealer + 1)%10 + 10
     end
     self.round = 0
-    deal(self.round)
+    self.high_bet = 0
+    self.high_better = get_next_player(self.dealer)
     self.save
+    deal(self.round)
   end
 
   def set_round(round)

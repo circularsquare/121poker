@@ -138,11 +138,14 @@ Dealer Loc: <%= @game.dealer%>
     <%if @game.can_raise?(get_player(current_user, @game)) %>
       <%= form_with(url: "action", method: 'post') do %>
         <%= hidden_field_tag(:game, @game.id) %>
-        <%= hidden_field_tag(:type, 'bet') %>
+        <%= hidden_field_tag(:type, 'raise') %>
         <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
         <%= number_field_tag(:amount) %>
         <%= submit_tag("raise") %>
-      <% end %> <% end %>
+      <% end %>
+    <% end %>
+  <% elsif @game.round < 4 %>
+    <%= button_to 'let ai play', 'ai_play', params:{game: @game.id} %>
   <% end %>
 <%end%> <br/>
 

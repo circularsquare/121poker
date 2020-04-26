@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   post 'games/set_round', to: 'games#set_round'
   post 'games/leave_game', to: 'games#leave_game'
   post 'games/start_game', to: 'games#start_game'
+  post 'games/ai_play', to: 'games#ai_play'
 
   #created by andrew while learning rails 2/13, see app/controllers/cards_controller.rb
   resources :games
