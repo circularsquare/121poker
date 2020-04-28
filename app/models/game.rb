@@ -118,9 +118,10 @@ class Game < ApplicationRecord
         put_money(amount, @player)
       end
     when 'raise'
+      # If player doesn't have enough money or trying to not raise enough and can't bet enough
       if amount > @player.money || (amount + @player.in_pot_current < 2*self.high_bet && 2*self.high_bet - @player.in_pot_current > @player.money)
         amount = @player.money
-      elsif amount + @player.in_pot_current < 2*self.high_bet
+      elsif amount + @player.in_pot_current < self.high_bet
         amount = 2*self.high_bet - @player.in_pot_current
       else
         amount = amount + self.high_bet - @player.in_pot_current
@@ -243,7 +244,7 @@ class Game < ApplicationRecord
   end
 
   def get_winners()
-    scoreToString = {1=>'high card', 2=>'pair', 3=>'two pair', 4=>'three of a kind', 5=>'straight', 6=>'flush', 7=>'full house', 8=>'four of a kind', 9=>'straight flush', 10=>'royal flush'}
+    scoreToString = {1=>'High Card', 2=>'Pair', 3=>'Two Pair', 4=>'Three of a Kind', 5=>'Straight', 6=>'Flush', 7=>'Full House', 8=>'Four of a Kind', 9=>'Straight Flush', 10=>'Royal Flush'}
     high_score = -100^7
     winners = []
     players_in_hand = self.players.where(:in_hand => true)

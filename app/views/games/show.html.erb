@@ -1,9 +1,7 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Room name:</strong>
-  <%= @game.room_name %>
-</p>
+<strong>Room name:</strong>
+<%= @game.room_name %>
 
 <% if @game.round > 0 %>
   <center><h2>Table Cards</h2></center>
@@ -16,18 +14,41 @@
     <%end%>
   </div>
   <div class="row">
-    <div class="text box">
-      Pot: <%= @game.pot %>
-    </div>
+    <b><font size="+1">
+      <font color='000000'>
+        <div class="text-box">
+          Pot: $<%= @game.pot %>
+        </div>
+      </font>
+    </font></b>
+  </div>
+  <div class="row">
+    <b><font color='000000'>
+      <div class="text-box">
+        High bet: $<%= @game.high_bet %>
+      </div>
+    </font></b>
+  </div>
+  <br/>
+  <div class = "row">
+    <% @game.players.each do |player| %>
+      <% player_name = player.username %>
+      <% if player.location == @game.dealer %>
+        <% player_name += " (dealer)" %>
+      <%end%>
+      <% if @game.current_player == player.location && @game.round != 4 %>
+        <b><font color='bb1111'><div class="text-box"><%= player_name %></div></font></b>
+      <% else %>
+        <div class="text-box"><%= player_name %></div>
+      <%end%>
+    <%end%>
   </div>
   <div class = "row">
     <% @game.players.each do |player| %>
-      <% if @game.current_player == player.location %>
-        <font color='bb1111'><div class="text-box"><%= player.username %></div></font>
-      <% else %>
-        <div class="text-box"><%= player.username %></div>
-      <%end%>
-    <%end%>
+      <div class="text-box">
+        Bank: $<%= player.money %>
+      </div>
+    <% end %>
   </div>
   <div class = "row">
     <% @game.players.each do |player| %>
@@ -47,68 +68,33 @@
     <%end%>
   </div>
   <div class="row">
-  <% @game.players.each do |player| %>
-    <div class="text-box">Bet: <%= player.in_pot_current %></div>
-  <%end%>
+  <% if @game.round != 4 %>
+    <% @game.players.each do |player| %>
+      <% bet = "$" + player.in_pot_current.to_s %>
+      <% if player.in_hand == false %>
+        <% bet = "Folded" %>
+      <%end%>
+      <div class="text-box">Bet: <%= bet %></div>
+    <%end%>
+  <% else %>
+    <% winners = @game.get_winners() %>
+    <% @game.players.each do |player| %>
+      <% if player.in_hand == false %>
+        <div class="text-box">Folded</div>
+      <% elsif winners.include?(player) %>
+        <b><div class="text-box"><%= player.hand %></div></b>
+      <% else %>
+        <div class="text-box"><%= player.hand %></div>
+      <% end %>
+    <% end %>
+  <% end %>
   </div>
   <div class="row">
     <% @game.players.each do |player| %>
-      <div class="text-box">In pot: <%= player.in_pot_hand %></div>
+      <div class="text-box">In pot: $<%= player.in_pot_hand %></div>
     <%end%>
   </div>
 </div>
-
-<h2><b>Players</b></h2>
-<div class="container">
-  <div class="table">
-    <div class="table-header">
-      <div class="header__item"> username </div>
-      <div class="header__item"> location </div>
-      <div class="header__item"> in hand? </div>
-      <div class="header__item"> cards </div>
-      <div class="header__item"> money </div>
-      <div class="header__item"> $ in round </div>
-      <% if @game.round == 4 %>
-        <div class="header__item"> best hand </div>
-      <% end %>
-
-    </div>
-    <% @game.players.each do |player| %>
-      <div class="table-row">
-        <div class='table-data'> <% if @game.current_player == player.location %>
-                                    <font color='bb1111'> <%= player.username %> </font>
-                                 <% else %>
-                                    <%= player.username %> <%end%></div>
-        <div class='table-data'> <%= player.location %></div>
-        <div class='table-data'> <% if player.in_hand %> yes <%else%> no <%end%></div>
-        <div class='table-data'> <% get_players_cards(player, @game).each do |card| %>
-                                      <%= card.rank %><%= card.suit %> <%end%></div>
-        <div class='table-data'> <%= player.money %></div>
-        <div class='table-data'> <%= player.in_pot_current %> </div>
-        <% if @game.round == 4 %>
-          <div class= 'table-data'> <%= player.hand %> </div>
-        <% end %>
-      </div>
-    <%end%>
-  </div>
-</div>
-
-<br/>
-
-<h2><b> Game info </b></h2>
-Game round: <%= @game.round %> <br/>
-<br/>
-Pot: <%= @game.pot %>
-<br/>
-Dealer Loc: <%= @game.dealer%>
-<br/>
-<% if @game.round != -1 %>
-  Current player: <%= @game.current_player%>
-  <br/>
-  High better: <%= @game.high_better%>
-  <br/>
-  High bet: <%= @game.high_bet%>
-<% end %>
 
 <% if in_game(current_user, @game) %>
   <% if @game.round == 4 %>
@@ -116,24 +102,21 @@ Dealer Loc: <%= @game.dealer%>
   <% end %>
 <%end%>
 
-
-
 <br/>
 
 <% if in_game(current_user, @game) %>
   <% if get_player(current_user, @game).location == @game.current_player && @game.round < 4 %>
-    <%= button_to 'fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
     <%if @game.can_call?(get_player(current_user, @game)) %>
-      <%= button_to 'call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %> <%end%>
+      <%= button_to 'Call', 'action', params:{game: @game.id, type: 'call', player: get_player(current_user, @game)} %> <%end%>
     <%if @game.can_check?(get_player(current_user, @game)) %>
-      <%= button_to 'check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %> <%end%>
+      <%= button_to 'Check', 'action', params:{game: @game.id, type: 'check', player: get_player(current_user, @game)} %> <%end%>
     <%if @game.can_bet?(get_player(current_user, @game)) %>
       <%= form_with(url: "action", method: 'post') do %>
         <%= hidden_field_tag(:game, @game.id) %>
         <%= hidden_field_tag(:type, 'bet') %>
         <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
         <%= number_field_tag(:amount) %>
-        <%= submit_tag("bet") %>
+        <%= submit_tag("Bet") %>
       <% end %> <% end %>
     <%if @game.can_raise?(get_player(current_user, @game)) %>
       <%= form_with(url: "action", method: 'post') do %>
@@ -141,21 +124,24 @@ Dealer Loc: <%= @game.dealer%>
         <%= hidden_field_tag(:type, 'raise') %>
         <%= hidden_field_tag(:player, get_player(current_user, @game).id) %>
         <%= number_field_tag(:amount) %>
-        <%= submit_tag("raise") %>
+        <%= submit_tag("Raise") %>
       <% end %>
     <% end %>
+    <%= button_to 'Fold', 'action', params:{game: @game.id, type: 'fold', player: get_player(current_user, @game)} %>
   <% elsif @game.round < 4 %>
     <%= button_to 'let ai play', 'ai_play', params:{game: @game.id} %>
+    <br/><br/>
   <% end %>
 <%end%> <br/>
 
-<%= button_to 'Add AI 1', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
-<%= button_to 'Add AI 2', 'add_ai', params:{game: @game.id, type: '2', user: current_user} %>
+<% if @game.round == 4 %>
+  <%= button_to 'Add AI 1', 'add_ai', params:{game: @game.id, type: '1', user: current_user} %>
+  <%= button_to 'Add AI 2', 'add_ai', params:{game: @game.id, type: '2', user: current_user} %>
+<% end %>
 <% if !in_game(current_user, @game) %>
   <%= button_to 'Join Game', 'add_player', params:{game: @game.id, user: current_user } %>
 <% else %>
   <%= button_to 'Leave Game', 'leave_game', params:{game: @game.id, player: get_player(current_user, @game)}%>
 <%end%>
 
-<br/>
 <%= link_to 'Settings', edit_game_path(@game) %>
